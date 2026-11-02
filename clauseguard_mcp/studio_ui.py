@@ -348,6 +348,7 @@ def render_studio_html() -> str:
         <a href="/privacy">Privacy Policy</a>
         <a href="/terms">Terms &amp; Disclaimer</a>
         <span id="planBadgeText" style="color:var(--accent);font-weight:600;">Complimentary Plan (1 Review / Month)</span>
+        <a href="https://buy.stripe.com/3cI7sL5hz4JVccl4k2fAc00" target="_blank" rel="noopener" style="color:var(--accent);font-weight:600;">Upgrade ($49.99) →</a>
       </div>
     </div>
   </header>
@@ -489,7 +490,7 @@ def render_studio_html() -> str:
 
       <!-- MEMBERSHIP PLAN DRAWER -->
       <details class="assistant-drawer">
-        <summary>Membership Plan &amp; Review Quota (Complimentary vs. Professional $49/mo)</summary>
+        <summary>Membership Plan &amp; Review Quota (Complimentary vs. Professional $49.99)</summary>
         <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end;margin-top:0.65rem;">
           <div>
             <label for="clientIdInput">Your Workspace Name</label>
@@ -499,7 +500,8 @@ def render_studio_html() -> str:
             <label for="apiKeyInput">Professional Plan Access Key (Optional)</label>
             <input id="apiKeyInput" placeholder="Leave blank for Complimentary Plan" />
           </div>
-          <div style="display:flex;gap:0.45rem;">
+          <div style="display:flex;gap:0.45rem;flex-wrap:wrap;">
+            <a href="https://buy.stripe.com/3cI7sL5hz4JVccl4k2fAc00" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;padding:0.5rem 0.9rem;border-radius:10px;background:var(--accent);color:#ffffff;font-weight:600;text-decoration:none;font-size:0.88rem;">Upgrade via Stripe ($49.99) →</a>
             <button class="secondary" onclick="activateProKey()">Try Professional Plan ($49/mo)</button>
             <button class="secondary" onclick="clearProKey()">Use Complimentary Plan</button>
           </div>

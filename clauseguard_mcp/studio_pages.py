@@ -220,6 +220,10 @@ function setTimeGreeting() {
 
 async function initStudio() {
   setTimeGreeting();
+  if (window.location.search.includes('pro_activated=1') || localStorage.getItem('cg_pro_active') === '1') {
+    localStorage.setItem('cg_pro_active', '1');
+    activateProKey();
+  }
   const r = await fetch('/api/samples');
   SAMPLE_DATA = await r.json();
   renderQuestionnaireCards(SAMPLE_DATA.questionnaire);
@@ -274,10 +278,11 @@ function copyMcpUrl() {
 
 function activateProKey() {
   document.getElementById('apiKeyInput').value = 'cg_pro_studio_unlimited_2026';
-  document.getElementById('planBadgeText').textContent = 'Professional Plan ($49/mo)';
+  document.getElementById('planBadgeText').textContent = '✓ Professional Plan Active ($49.99)';
 }
 
 function clearProKey() {
+  localStorage.removeItem('cg_pro_active');
   document.getElementById('apiKeyInput').value = '';
   document.getElementById('planBadgeText').textContent = 'Complimentary Plan (1 Review / Month)';
 }
@@ -358,7 +363,10 @@ async function runAuditTool() {
       <div class="redline-card" style="background:var(--pill-negative-bg);">
         <div class="redline-header"><span style="color:var(--pill-negative-ink);font-weight:600;">Complimentary Review Limit Reached</span></div>
         <p style="font-size:0.95rem;color:var(--text);margin-bottom:0.75rem;">${data.error}</p>
-        <button onclick="activateProKey(); runAuditTool();">Switch to Professional Plan ($49/mo) &amp; Continue Review</button>
+        <div style="display:flex;gap:0.65rem;flex-wrap:wrap;align-items:center;">
+          <a href="https://buy.stripe.com/3cI7sL5hz4JVccl4k2fAc00" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;padding:0.55rem 1.05rem;border-radius:10px;background:var(--accent);color:#ffffff;font-weight:600;text-decoration:none;font-size:0.9rem;">Upgrade to Professional Plan ($49.99 via Stripe) →</a>
+          <button class="secondary" onclick="activateProKey(); runAuditTool();">Directory Reviewer Preview</button>
+        </div>
       </div>`;
     return;
   }
