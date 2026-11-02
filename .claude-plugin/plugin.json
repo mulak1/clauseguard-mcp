@@ -1,0 +1,23 @@
+{
+  "name": "clauseguard-contract-redlines",
+  "version": "1.0.0",
+  "description": "Plain-English commercial contract review, risk scoring, negotiation email drafting, security questionnaire completion, and downloadable Microsoft Word (.docx) Track Changes.",
+  "author": {
+    "name": "ClauseGuard Legal Desk",
+    "url": "https://clauseguard-mcp-production.up.railway.app"
+  },
+  "homepage": "https://clauseguard-mcp-production.up.railway.app",
+  "license": "MIT",
+  "keywords": [
+    "contract-review",
+    "legal",
+    "redline",
+    "docx",
+    "track-changes",
+    "msa",
+    "nda",
+    "dpa",
+    "baa",
+    "security-questionnaire"
+  ]
+}

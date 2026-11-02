@@ -1,0 +1,47 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "ClauseGuard MCP",
+  "name_for_model": "clauseguard_mcp",
+  "description_for_human": "Plain-English contract review, Microsoft Word (.docx) Track Changes redlines, draft comparisons, and security questionnaire answers.",
+  "description_for_model": "Use ClauseGuard MCP to review commercial agreements (MSA, NDA, SaaS, GDPR DPA, HIPAA BAA) against clear negotiation standards (founder_friendly, saas_vendor, gdpr_dpa, hipaa_baa), generate downloadable Microsoft Word (.docx) files with native Track Changes, compare two contract versions for material risk shifts, and complete vendor security questionnaires.",
+  "auth": {
+    "type": "oauth",
+    "client_url": "https://clauseguard-mcp-production.up.railway.app/oauth/authorize",
+    "authorization_url": "https://clauseguard-mcp-production.up.railway.app/oauth/token",
+    "authorization_content_type": "application/x-www-form-urlencoded",
+    "pkce_method": "S256",
+    "scope": "mcp:tools"
+  },
+  "mcp_server": {
+    "url": "https://clauseguard-mcp-production.up.railway.app/mcp",
+    "transport": "streamable-http",
+    "tools": [
+      {
+        "name": "audit_and_redline_contract",
+        "title": "Review & Redline Agreement (Word Track Changes)",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      {
+        "name": "autofill_security_questionnaire",
+        "title": "Complete Customer Security Questionnaire",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      {
+        "name": "compare_contract_versions",
+        "title": "Compare Agreement Drafts for Risk Shifts",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    ]
+  },
+  "legal_info_url": "https://clauseguard-mcp-production.up.railway.app/terms",
+  "privacy_policy_url": "https://clauseguard-mcp-production.up.railway.app/privacy"
+}

@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "clauseguard": {
+      "type": "http",
+      "url": "https://clauseguard-mcp-production.up.railway.app/mcp"
+    }
+  }
+}

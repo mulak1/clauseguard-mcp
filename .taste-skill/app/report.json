@@ -1,0 +1,1643 @@
+{
+ "url": "http://127.0.0.1:8792",
+ "at": "2026-11-02T09:37:27.906Z",
+ "allow": [],
+ "viewports": [
+  {
+   "width": 1440,
+   "height": 900,
+   "load": "load",
+   "screens": 5,
+   "filled": [
+    0.5,
+    0.4,
+    0.37,
+    0.47,
+    0.48
+   ],
+   "motion": {
+    "elements": 0,
+    "css": 0,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "page": {
+     "height": 4272,
+     "screens": 4.7,
+     "words": 1211,
+     "img": 0,
+     "video": 0,
+     "canvas": 0,
+     "svg": 0,
+     "sections": 2,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Good morning. Let's review your agreement.",
+     "words": 6,
+     "chars": 42,
+     "lines": 1,
+     "size": 30,
+     "vw": 2.1,
+     "font": "Instrument Serif",
+     "weight": 400,
+     "tracking": -0.01,
+     "leading": 1.15,
+     "top": 142,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "h1": {
+     "text": "Good morning. Let's review your agreement.",
+     "words": 6,
+     "lines": 1,
+     "size": 30,
+     "font": "Instrument Serif"
+    },
+    "headings": [
+     {
+      "text": "Good morning. Let's review your agreement.",
+      "words": 6,
+      "chars": 42,
+      "lines": 1,
+      "size": 30,
+      "vw": 2.1,
+      "font": "Instrument Serif",
+      "weight": 400,
+      "tracking": -0.01,
+      "leading": 1.15,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.75,
+      "top": 142,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "98/100",
+      "words": 1,
+      "chars": 6,
+      "lines": 1,
+      "size": 28,
+      "vw": 1.9,
+      "font": "Instrument Sans",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.15,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.14,
+      "top": 291,
+      "tag": "div",
+      "kind": "heading"
+     },
+     {
+      "text": "20/100",
+      "words": 1,
+      "chars": 6,
+      "lines": 1,
+      "size": 28,
+      "vw": 1.9,
+      "font": "Instrument Sans",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.15,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.14,
+      "top": 291,
+      "tag": "div",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 3,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": 1,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Instrument Sans",
+       "share": 1,
+       "mono": false
+      },
+      {
+       "family": "Instrument Serif",
+       "share": 0,
+       "mono": false
+      },
+      {
+       "family": "monospace",
+       "share": 0,
+       "mono": false
+      }
+     ],
+     "familyCount": 3,
+     "sizes": [
+      13,
+      14,
+      15,
+      16,
+      17,
+      20,
+      28,
+      30
+     ],
+     "sizeCount": 8,
+     "notLoaded": [],
+     "body": {
+      "font": "Instrument Sans",
+      "size": 15.4,
+      "leading": 1.55,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 16.4
+     },
+     "measureChars": 87,
+     "max": {
+      "size": 30,
+      "vw": 2.1,
+      "font": "Instrument Serif",
+      "text": "Good morning. Let's review your agreemen"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [
+      "monospace"
+     ],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0,
+     "centerShare": 0.03,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#ffffff",
+     "bodyBgHsl": {
+      "h": 0,
+      "s": 0,
+      "l": 1
+     },
+     "dark": false,
+     "sectionBgs": [
+      {
+       "color": "#f9f9f9",
+       "top": 714,
+       "hsl": {
+        "h": 0,
+        "s": 0,
+        "l": 0.98
+       }
+      },
+      {
+       "color": "#ffffff",
+       "top": 960,
+       "hsl": {
+        "h": 0,
+        "s": 0,
+        "l": 1
+       }
+      },
+      {
+       "color": "#fffbeb",
+       "top": 3312,
+       "hsl": {
+        "h": 48,
+        "s": 1,
+        "l": 0.96
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#1f201d",
+       "share": 0.77
+      },
+      {
+       "color": "#52524e",
+       "share": 0.11
+      },
+      {
+       "color": "#04250e",
+       "share": 0.05
+      },
+      {
+       "color": "#7a1d14",
+       "share": 0.04
+      },
+      {
+       "color": "#2e7d32",
+       "share": 0.01
+      }
+     ],
+     "button": {
+      "bg": "#f9f9f9",
+      "hsl": {
+       "h": 0,
+       "s": 0,
+       "l": 0.98
+      },
+      "fg": "#1f201d"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 37,
+     "inHero": 8,
+     "radius": "pill",
+     "height": 29,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Download Word (.docx) with Track Changes",
+      "1. Review & Redline Agreement",
+      "2. Security Questionnaire Desk",
+      "3. Compare Two Drafts",
+      "Enterprise Master Services Agreement Ven"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 26,
+     "boxRadius": 16,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": [
+      {
+       "count": 3,
+       "iconTopped": false,
+       "rounded": true,
+       "top": 275
+      },
+      {
+       "count": 8,
+       "iconTopped": false,
+       "rounded": true,
+       "top": 734
+      }
+     ]
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 2,
+     "fixed": false,
+     "height": 110,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "instrument sans",
+     "instrument serif"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "pageH": 4272,
+    "margins": {
+     "left": 196,
+     "right": 202
+    },
+    "sections": [
+     {
+      "sel": "section.kpi-strip",
+      "tag": "section",
+      "top": 275,
+      "height": 134,
+      "words": 36,
+      "media": 0,
+      "middle": 67,
+      "heading": {
+       "text": "98/100",
+       "size": 28,
+       "tag": "div"
+      },
+      "left": 200,
+      "right": 200,
+      "textLeft": 200,
+      "textRight": 224,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "div#panelAudit.panel",
+      "tag": "div",
+      "top": 478,
+      "height": 220,
+      "words": 52,
+      "media": 0,
+      "middle": 0,
+      "heading": null,
+      "left": 202,
+      "right": 202,
+      "textLeft": 202,
+      "textRight": 218,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div#resultsCard.panel",
+      "tag": "div",
+      "top": 714,
+      "height": 3352,
+      "words": 1062,
+      "media": 0,
+      "middle": 0,
+      "heading": null,
+      "left": 202,
+      "right": 202,
+      "textLeft": 202,
+      "textRight": 215,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Good morning. Let's review your agreement.",
+      "size": 30,
+      "top": 142,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 222,
+      "n": 3
+     },
+     {
+      "x": 334,
+      "n": 3
+     },
+     {
+      "x": 182,
+      "n": 2
+     },
+     {
+      "x": 236,
+      "n": 2
+     },
+     {
+      "x": 202,
+      "n": 1
+     }
+    ],
+    "leftBlocks": 11,
+    "bodySize": 13,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0.11,
+    "voidBox": {
+     "x": 0,
+     "y": 120,
+     "w": 180,
+     "h": 780
+    }
+   },
+   "app": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "dark": false,
+    "ground": "#ffffff",
+    "sidebar": null,
+    "topbar": null,
+    "canvas": {
+     "left": 182,
+     "right": 202
+    },
+    "hero": {
+     "text": "Good morning. Let's review your agreement.",
+     "words": 6,
+     "chars": 42,
+     "lines": 1,
+     "size": 30,
+     "vw": 2.1,
+     "font": "Instrument Serif",
+     "weight": 400,
+     "tracking": -0.01,
+     "leading": 1.15,
+     "top": 142,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 1,
+    "layout": {
+     "panels": 6,
+     "firstScreen": 6,
+     "ragged": [
+      {
+       "diff": 31,
+       "top": 275
+      }
+     ],
+     "voids": []
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 22,
+     "radii": [
+      [
+       16,
+       15
+      ],
+      [
+       8,
+       7
+      ]
+     ],
+     "heavyBorders": 0,
+     "borderSamples": [],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 0,
+     "tabularShare": null,
+     "kpiMax": null
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      13,
+      14,
+      15,
+      16,
+      17,
+      20,
+      28,
+      30
+     ]
+    },
+    "title": {
+     "text": "Good morning. Let's review your agreement.",
+     "size": 30,
+     "top": 142
+    },
+    "colourShare": 0.007
+   },
+   "consoleErrors": []
+  },
+  {
+   "width": 768,
+   "height": 1024,
+   "load": "load",
+   "screens": 2,
+   "filled": [
+    0.6,
+    0.78
+   ],
+   "motion": {
+    "elements": 0,
+    "css": 0,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "page": {
+     "height": 1646,
+     "screens": 1.6,
+     "words": 270,
+     "img": 0,
+     "video": 0,
+     "canvas": 0,
+     "svg": 0,
+     "sections": 2,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Good morning. Let's review your agreement.",
+     "words": 6,
+     "chars": 42,
+     "lines": 1,
+     "size": 30,
+     "vw": 3.9,
+     "font": "Instrument Serif",
+     "weight": 400,
+     "tracking": -0.01,
+     "leading": 1.15,
+     "top": 180,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "h1": {
+     "text": "Good morning. Let's review your agreement.",
+     "words": 6,
+     "lines": 1,
+     "size": 30,
+     "font": "Instrument Serif"
+    },
+    "headings": [
+     {
+      "text": "Good morning. Let's review your agreement.",
+      "words": 6,
+      "chars": 42,
+      "lines": 1,
+      "size": 30,
+      "vw": 3.9,
+      "font": "Instrument Serif",
+      "weight": 400,
+      "tracking": -0.01,
+      "leading": 1.15,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.92,
+      "top": 180,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "98/100",
+      "words": 1,
+      "chars": 6,
+      "lines": 1,
+      "size": 28,
+      "vw": 3.6,
+      "font": "Instrument Sans",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.15,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.4,
+      "top": 329,
+      "tag": "div",
+      "kind": "heading"
+     },
+     {
+      "text": "20/100",
+      "words": 1,
+      "chars": 6,
+      "lines": 1,
+      "size": 28,
+      "vw": 3.6,
+      "font": "Instrument Sans",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.15,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.4,
+      "top": 329,
+      "tag": "div",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 3,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": 1,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Instrument Sans",
+       "share": 0.97,
+       "mono": false
+      },
+      {
+       "family": "Instrument Serif",
+       "share": 0.02,
+       "mono": false
+      },
+      {
+       "family": "monospace",
+       "share": 0.01,
+       "mono": false
+      }
+     ],
+     "familyCount": 3,
+     "sizes": [
+      13,
+      14,
+      15,
+      16,
+      20,
+      28,
+      30
+     ],
+     "sizeCount": 7,
+     "notLoaded": [],
+     "body": {
+      "font": "Instrument Sans",
+      "size": 15.4,
+      "leading": 1.55,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 16.4
+     },
+     "measureChars": 82,
+     "max": {
+      "size": 30,
+      "vw": 3.9,
+      "font": "Instrument Serif",
+      "text": "Good morning. Let's review your agreemen"
+     },
+     "monoShare": 0.01,
+     "monoProseShare": 0,
+     "monoFamilies": [
+      "monospace"
+     ],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0,
+     "centerShare": 0.11,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#ffffff",
+     "bodyBgHsl": {
+      "h": 0,
+      "s": 0,
+      "l": 1
+     },
+     "dark": false,
+     "sectionBgs": [
+      {
+       "color": "#f9f9f9",
+       "top": 583,
+       "hsl": {
+        "h": 0,
+        "s": 0,
+        "l": 0.98
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#1f201d",
+       "share": 0.62
+      },
+      {
+       "color": "#52524e",
+       "share": 0.27
+      },
+      {
+       "color": "#ffffff",
+       "share": 0.06
+      },
+      {
+       "color": "#1b6e66",
+       "share": 0.04
+      },
+      {
+       "color": "#7a1d14",
+       "share": 0.01
+      }
+     ],
+     "button": {
+      "bg": "#ffffff",
+      "hsl": {
+       "h": 0,
+       "s": 0,
+       "l": 1
+      },
+      "fg": "#1f201d"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 15,
+     "inHero": 7,
+     "radius": "pill",
+     "height": 35,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Download Word (.docx) with Track Changes",
+      "1. Review & Redline Agreement",
+      "2. Security Questionnaire Desk",
+      "3. Compare Two Drafts",
+      "Enterprise Master Services Agreement Ven"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 9,
+     "boxRadius": 16,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": [
+      {
+       "count": 3,
+       "iconTopped": false,
+       "rounded": true,
+       "top": 313
+      }
+     ]
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 2,
+     "fixed": false,
+     "height": 148,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "instrument sans",
+     "instrument serif"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "pageH": 1646,
+    "margins": {
+     "left": 32,
+     "right": 52
+    },
+    "sections": [
+     {
+      "sel": "header.topbar",
+      "tag": "header",
+      "top": 0,
+      "height": 148,
+      "words": 40,
+      "media": 0,
+      "middle": 0,
+      "heading": null,
+      "left": 32,
+      "right": 109,
+      "textLeft": 32,
+      "textRight": 109,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "main.shell",
+      "tag": "main",
+      "top": 148,
+      "height": 1498,
+      "words": 252,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Good morning. Let's review your agreement.",
+       "size": 30,
+       "tag": "h1"
+      },
+      "left": 32,
+      "right": 50,
+      "textLeft": 32,
+      "textRight": 62,
+      "fullBleed": false,
+      "footer": true,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Good morning. Let's review your agreement.",
+      "size": 30,
+      "top": 180,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 32,
+      "n": 2
+     },
+     {
+      "x": 52,
+      "n": 1
+     },
+     {
+      "x": 72,
+      "n": 1
+     }
+    ],
+    "leftBlocks": 4,
+    "bodySize": 15,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "dark": false,
+    "ground": "#ffffff",
+    "sidebar": null,
+    "topbar": null,
+    "canvas": {
+     "left": 32,
+     "right": 50
+    },
+    "hero": {
+     "text": "Good morning. Let's review your agreement.",
+     "words": 6,
+     "chars": 42,
+     "lines": 1,
+     "size": 30,
+     "vw": 3.9,
+     "font": "Instrument Serif",
+     "weight": 400,
+     "tracking": -0.01,
+     "leading": 1.15,
+     "top": 180,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 1,
+    "layout": {
+     "panels": 7,
+     "firstScreen": 5,
+     "ragged": [],
+     "voids": []
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 8,
+     "radii": [
+      [
+       16,
+       8
+      ]
+     ],
+     "heavyBorders": 0,
+     "borderSamples": [],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 0,
+     "tabularShare": null,
+     "kpiMax": null
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      13,
+      14,
+      15,
+      16,
+      20,
+      28,
+      30
+     ]
+    },
+    "title": {
+     "text": "Good morning. Let's review your agreement.",
+     "size": 30,
+     "top": 180
+    },
+    "colourShare": 0.011
+   },
+   "consoleErrors": []
+  },
+  {
+   "width": 390,
+   "height": 844,
+   "load": "load",
+   "screens": 3,
+   "filled": [
+    0.65,
+    0.56,
+    0.66
+   ],
+   "motion": {
+    "elements": 0,
+    "css": 0,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 481,
+     "h": 1039
+    },
+    "page": {
+     "height": 2212,
+     "screens": 2.1,
+     "words": 270,
+     "img": 0,
+     "video": 0,
+     "canvas": 0,
+     "svg": 0,
+     "sections": 2,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Good morning. Let's review your agreement.",
+     "words": 6,
+     "chars": 42,
+     "lines": 1,
+     "size": 24,
+     "vw": 5,
+     "font": "Instrument Serif",
+     "weight": 400,
+     "tracking": -0.01,
+     "leading": 1.15,
+     "top": 269,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "h1": {
+     "text": "Good morning. Let's review your agreement.",
+     "words": 6,
+     "lines": 1,
+     "size": 24,
+     "font": "Instrument Serif"
+    },
+    "headings": [
+     {
+      "text": "Good morning. Let's review your agreement.",
+      "words": 6,
+      "chars": 42,
+      "lines": 1,
+      "size": 24,
+      "vw": 5,
+      "font": "Instrument Serif",
+      "weight": 400,
+      "tracking": -0.01,
+      "leading": 1.15,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.74,
+      "top": 269,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "98/100",
+      "words": 1,
+      "chars": 6,
+      "lines": 1,
+      "size": 28,
+      "vw": 5.8,
+      "font": "Instrument Sans",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.15,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.58,
+      "top": 435,
+      "tag": "div",
+      "kind": "heading"
+     },
+     {
+      "text": "20/100",
+      "words": 1,
+      "chars": 6,
+      "lines": 1,
+      "size": 28,
+      "vw": 5.8,
+      "font": "Instrument Sans",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.15,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.2,
+      "top": 435,
+      "tag": "div",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 3,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": 6,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Instrument Sans",
+       "share": 0.97,
+       "mono": false
+      },
+      {
+       "family": "Instrument Serif",
+       "share": 0.02,
+       "mono": false
+      },
+      {
+       "family": "monospace",
+       "share": 0.01,
+       "mono": false
+      }
+     ],
+     "familyCount": 3,
+     "sizes": [
+      13,
+      14,
+      15,
+      16,
+      20,
+      24,
+      28
+     ],
+     "sizeCount": 7,
+     "notLoaded": [],
+     "body": {
+      "font": "Instrument Sans",
+      "size": 15.4,
+      "leading": 1.55,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 16.4
+     },
+     "measureChars": 37,
+     "max": {
+      "size": 28,
+      "vw": 5.8,
+      "font": "Instrument Sans",
+      "text": "98/100"
+     },
+     "monoShare": 0.01,
+     "monoProseShare": 0,
+     "monoFamilies": [
+      "monospace"
+     ],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0,
+     "centerShare": 0.11,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#ffffff",
+     "bodyBgHsl": {
+      "h": 0,
+      "s": 0,
+      "l": 1
+     },
+     "dark": false,
+     "sectionBgs": [
+      {
+       "color": "#f9f9f9",
+       "top": 951,
+       "hsl": {
+        "h": 0,
+        "s": 0,
+        "l": 0.98
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#1f201d",
+       "share": 0.62
+      },
+      {
+       "color": "#52524e",
+       "share": 0.27
+      },
+      {
+       "color": "#ffffff",
+       "share": 0.06
+      },
+      {
+       "color": "#1b6e66",
+       "share": 0.04
+      },
+      {
+       "color": "#7a1d14",
+       "share": 0.01
+      }
+     ],
+     "button": {
+      "bg": "#ffffff",
+      "hsl": {
+       "h": 0,
+       "s": 0,
+       "l": 1
+      },
+      "fg": "#1f201d"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 12,
+     "inHero": 4,
+     "radius": "pill",
+     "height": 35,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "1. Review & Redline Agreement",
+      "2. Security Questionnaire Desk",
+      "3. Compare Two Drafts",
+      "Enterprise Master Services Agreement Ven"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 8,
+     "boxRadius": 16,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": [
+      {
+       "count": 3,
+       "iconTopped": false,
+       "rounded": true,
+       "top": 951
+      }
+     ]
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 0,
+     "fixed": false,
+     "height": 249,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "instrument sans",
+     "instrument serif"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 481,
+     "h": 1039
+    },
+    "pageH": 2212,
+    "margins": {
+     "left": 16,
+     "right": 19
+    },
+    "sections": [
+     {
+      "sel": "header.topbar",
+      "tag": "header",
+      "top": 0,
+      "height": 249,
+      "words": 40,
+      "media": 0,
+      "middle": 0,
+      "heading": null,
+      "left": 16,
+      "right": 111,
+      "textLeft": 16,
+      "textRight": 111,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section.editorial-greeting-block",
+      "tag": "section",
+      "top": 269,
+      "height": 128,
+      "words": 38,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Good morning. Let's review your agreement.",
+       "size": 24,
+       "tag": "h1"
+      },
+      "left": 16,
+      "right": 115,
+      "textLeft": 16,
+      "textRight": 115,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.kpi-strip",
+      "tag": "section",
+      "top": 419,
+      "height": 378,
+      "words": 34,
+      "media": 0,
+      "middle": 52,
+      "heading": {
+       "text": "98/100",
+       "size": 28,
+       "tag": "div"
+      },
+      "left": 34,
+      "right": 19,
+      "textLeft": 34,
+      "textRight": 19,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.workspace-stack",
+      "tag": "div",
+      "top": 951,
+      "height": 1212,
+      "words": 137,
+      "media": 0,
+      "middle": 0,
+      "heading": null,
+      "left": 36,
+      "right": 30,
+      "textLeft": 36,
+      "textRight": 30,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Good morning. Let's review your agreement.",
+      "size": 24,
+      "top": 269,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 16,
+      "n": 2
+     },
+     {
+      "x": 36,
+      "n": 1
+     },
+     {
+      "x": 56,
+      "n": 1
+     }
+    ],
+    "leftBlocks": 4,
+    "bodySize": 15,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": {
+    "viewport": {
+     "w": 481,
+     "h": 1039
+    },
+    "dark": false,
+    "ground": "#ffffff",
+    "sidebar": null,
+    "topbar": null,
+    "canvas": {
+     "left": 16,
+     "right": 14
+    },
+    "hero": {
+     "text": "Good morning. Let's review your agreement.",
+     "words": 6,
+     "chars": 42,
+     "lines": 1,
+     "size": 24,
+     "vw": 5,
+     "font": "Instrument Serif",
+     "weight": 400,
+     "tracking": -0.01,
+     "leading": 1.15,
+     "top": 269,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 2,
+    "layout": {
+     "panels": 7,
+     "firstScreen": 4,
+     "ragged": [],
+     "voids": []
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 10,
+     "radii": [
+      [
+       16,
+       7
+      ],
+      [
+       8,
+       2
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "heavyBorders": 0,
+     "borderSamples": [],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 0,
+     "tabularShare": null,
+     "kpiMax": null
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      13,
+      14,
+      15,
+      16,
+      20,
+      24,
+      28
+     ]
+    },
+    "title": {
+     "text": "Good morning. Let's review your agreement.",
+     "size": 24,
+     "top": 269
+    },
+    "colourShare": 0.007
+   },
+   "consoleErrors": []
+  }
+ ],
+ "findings": [
+  {
+   "level": "WARN",
+   "id": "palette-cream",
+   "width": 1440,
+   "message": "Yellow-cream background (section #fffbeb).",
+   "fix": "Use the drawn palette. If you want warmth, take a low-chroma stone or bone, not a yellow cream."
+  },
+  {
+   "level": "WARN",
+   "id": "ragged-row",
+   "width": 1440,
+   "message": "1 pair(s) of cards in one row end at different heights (by 31px).",
+   "fix": "Cards that share a row share a bottom edge: balance them by their content (the same number of rows, a block of similar height beside it), or stack them. In testing, ragged rows were marked down every time."
+  }
+ ],
+ "images": [
+  {
+   "viewport": "desktop",
+   "width": 1440,
+   "fold": "/Users/kadermula/Downloads/Ideas/clauseguard-mcp/.taste-skill/app/desktop-fold.jpg",
+   "pages": [
+    "/Users/kadermula/Downloads/Ideas/clauseguard-mcp/.taste-skill/app/desktop-page-01.jpg",
+    "/Users/kadermula/Downloads/Ideas/clauseguard-mcp/.taste-skill/app/desktop-page-02.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "tablet",
+   "width": 768,
+   "fold": "/Users/kadermula/Downloads/Ideas/clauseguard-mcp/.taste-skill/app/tablet-fold.jpg",
+   "pages": [
+    "/Users/kadermula/Downloads/Ideas/clauseguard-mcp/.taste-skill/app/tablet-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "mobile",
+   "width": 390,
+   "fold": "/Users/kadermula/Downloads/Ideas/clauseguard-mcp/.taste-skill/app/mobile-fold.jpg",
+   "pages": [
+    "/Users/kadermula/Downloads/Ideas/clauseguard-mcp/.taste-skill/app/mobile-page-01.jpg"
+   ],
+   "film": []
+  }
+ ]
+}
