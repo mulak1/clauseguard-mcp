@@ -112,10 +112,59 @@ def render_docs_html() -> str:
 
     <h2>5. Policies &amp; Support</h2>
     <ul>
+      <li><strong>About ClauseGuard:</strong> <a href="/about">https://clauseguard-mcp-production.up.railway.app/about</a></li>
       <li><strong>Privacy &amp; Confidentiality Policy:</strong> <a href="/privacy">https://clauseguard-mcp-production.up.railway.app/privacy</a></li>
       <li><strong>Terms of Service:</strong> <a href="/terms">https://clauseguard-mcp-production.up.railway.app/terms</a></li>
       <li><strong>GitHub Repository:</strong> <a href="https://github.com/mulak1/clauseguard-mcp">https://github.com/mulak1/clauseguard-mcp</a></li>
       <li><strong>Support Email:</strong> <a href="mailto:mulak1@gmail.com">mulak1@gmail.com</a></li>
+    </ul>
+  </main>
+</body>
+</html>"""
+
+
+def render_about_html() -> str:
+    """Return the About & Company Information page for ClauseGuard."""
+    return """<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About ClauseGuard — Commercial Contract Review &amp; Word Redlines</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif:wght@400&display=swap" rel="stylesheet">
+  <style>
+    body { font-family:'Instrument Sans',system-ui,sans-serif; background:#f9f9f9; color:#1f201d; margin:0; padding:3rem 1.5rem; line-height:1.65; font-size:16px; }
+    main { max-width:780px; margin:0 auto; background:#ffffff; border-radius:22px; padding:2.75rem; }
+    h1 { font-family:'Instrument Serif',Georgia,serif; font-size:2.4rem; font-weight:400; margin:0 0 0.5rem; }
+    h2 { font-size:1.15rem; margin:1.85rem 0 0.5rem; color:#1b6e66; }
+    p, li { font-size:1rem; color:#1f201d; max-width:66ch; }
+    a { color:#1b6e66; text-decoration:none; font-weight:500; }
+  </style>
+</head>
+<body>
+  <main>
+    <p><a href="/">← Return to ClauseGuard Review Desk</a></p>
+    <h1>About ClauseGuard</h1>
+    <p><strong>ClauseGuard</strong> builds plain-English commercial contract review, redlining, and security questionnaire tools designed to work both as a standalone legal review desk and natively inside AI assistants via the Model Context Protocol (MCP).</p>
+
+    <h2>Our Mission</h2>
+    <p>Founders, legal counsel, procurement leads, and revenue teams spend hours manually marking up standard commercial agreements—Master Services Agreements (MSAs), Mutual NDAs, Data Processing Agreements (DPAs), and HIPAA Business Associate Agreements (BAAs). ClauseGuard gives every team instant, playbook-guided risk scoring, balanced fallback wording, negotiation emails, and native Microsoft Word (<code>.docx</code>) Track Changes without requiring an enterprise CLM contract.</p>
+
+    <h2>Privacy &amp; Security by Design</h2>
+    <ul>
+      <li><strong>Zero Model Training:</strong> We never train AI models on customer agreements or security questionnaires.</li>
+      <li><strong>Read-Only &amp; Ephemeral Architecture:</strong> All MCP tools are stateless and read-only, and generated Word Track Changes documents are held only in ephemeral memory for download.</li>
+      <li><strong>Open Standards:</strong> Built on the Model Context Protocol (MCP) and OpenXML WordprocessingML standards so your redlines open cleanly in Microsoft Word, Google Docs, and Apple Pages.</li>
+    </ul>
+
+    <h2>Company &amp; Leadership</h2>
+    <ul>
+      <li><strong>Organization:</strong> ClauseGuard</li>
+      <li><strong>Founder &amp; Creator:</strong> Kader Mula</li>
+      <li><strong>Website:</strong> <a href="https://clauseguard-mcp-production.up.railway.app">https://clauseguard-mcp-production.up.railway.app</a></li>
+      <li><strong>Documentation:</strong> <a href="/docs">https://clauseguard-mcp-production.up.railway.app/docs</a></li>
+      <li><strong>GitHub:</strong> <a href="https://github.com/mulak1/clauseguard-mcp">https://github.com/mulak1/clauseguard-mcp</a></li>
+      <li><strong>Contact &amp; Support:</strong> <a href="mailto:mulak1@gmail.com">mulak1@gmail.com</a></li>
     </ul>
   </main>
 </body>

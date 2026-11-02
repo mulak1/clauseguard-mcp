@@ -343,6 +343,8 @@ def render_studio_html() -> str:
       </div>
       <div class="trust-strip">
         <span><strong>Confidentiality Guarantee:</strong> Zero training on your agreements</span>
+        <a href="/about">About</a>
+        <a href="/docs">Documentation</a>
         <a href="/privacy">Privacy Policy</a>
         <a href="/terms">Terms &amp; Disclaimer</a>
         <span id="planBadgeText" style="color:var(--accent);font-weight:600;">Complimentary Plan (1 Review / Month)</span>

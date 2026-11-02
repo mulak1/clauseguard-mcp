@@ -47,7 +47,7 @@ from clauseguard_mcp.questionnaire_engine import (
     autofill_security_questionnaire,
     compare_contract_versions,
 )
-from clauseguard_mcp.studio_pages import render_docs_html
+from clauseguard_mcp.studio_pages import render_about_html, render_docs_html
 from clauseguard_mcp.studio_ui import (
     render_privacy_html,
     render_studio_html,
@@ -73,6 +73,10 @@ def create_app() -> FastAPI:
     @app.get("/", response_class=HTMLResponse)
     def get_studio() -> HTMLResponse:
         return HTMLResponse(content=render_studio_html())
+
+    @app.get("/about", response_class=HTMLResponse)
+    def get_about() -> HTMLResponse:
+        return HTMLResponse(content=render_about_html())
 
     @app.get("/docs", response_class=HTMLResponse)
     @app.get("/documentation", response_class=HTMLResponse)
