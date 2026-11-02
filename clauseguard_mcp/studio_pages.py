@@ -285,12 +285,35 @@ function copyMcpUrl() {
 function activateProKey() {
   document.getElementById('apiKeyInput').value = 'cg_pro_studio_unlimited_2026';
   document.getElementById('planBadgeText').textContent = '✓ Professional Plan Active ($49.99)';
+  const hLink = document.getElementById('headerUpgradeLink');
+  if (hLink) hLink.style.display = 'none';
+  const dLink = document.getElementById('drawerUpgradeLink');
+  if (dLink) dLink.style.display = 'none';
+}
+
+function applyManualKey() {
+  const val = document.getElementById('apiKeyInput').value.trim();
+  if (val.startsWith('cg_pro_')) {
+    localStorage.setItem('cg_pro_active', '1');
+    document.getElementById('planBadgeText').textContent = '✓ Professional Plan Active ($49.99)';
+    const hLink = document.getElementById('headerUpgradeLink');
+    if (hLink) hLink.style.display = 'none';
+    const dLink = document.getElementById('drawerUpgradeLink');
+    if (dLink) dLink.style.display = 'none';
+    runAuditTool();
+  } else {
+    clearProKey();
+  }
 }
 
 function clearProKey() {
   localStorage.removeItem('cg_pro_active');
   document.getElementById('apiKeyInput').value = '';
   document.getElementById('planBadgeText').textContent = 'Complimentary Plan (1 Review / Month)';
+  const hLink = document.getElementById('headerUpgradeLink');
+  if (hLink) hLink.style.display = 'inline';
+  const dLink = document.getElementById('drawerUpgradeLink');
+  if (dLink) dLink.style.display = 'inline-flex';
 }
 
 async function handleFileUpload(inputEl) {
@@ -371,7 +394,6 @@ async function runAuditTool() {
         <p style="font-size:0.95rem;color:var(--text);margin-bottom:0.75rem;">${data.error}</p>
         <div style="display:flex;gap:0.65rem;flex-wrap:wrap;align-items:center;">
           <a href="https://buy.stripe.com/3cI7sL5hz4JVccl4k2fAc00" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;padding:0.55rem 1.05rem;border-radius:10px;background:var(--accent);color:#ffffff;font-weight:600;text-decoration:none;font-size:0.9rem;">Upgrade to Professional Plan ($49.99 via Stripe) →</a>
-          <button class="secondary" onclick="activateProKey(); runAuditTool();">Directory Reviewer Preview</button>
         </div>
       </div>`;
     return;
