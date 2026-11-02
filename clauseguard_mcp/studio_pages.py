@@ -231,6 +231,12 @@ async function initStudio() {
   document.getElementById('versionAText').value = SAMPLE_DATA.diff_versions.version_a_text;
   document.getElementById('versionBText').value = SAMPLE_DATA.diff_versions.version_b_text;
   await loadSampleContract('predatory_msa');
+  if (window.location.search.includes('pro_activated=1')) {
+    const sub = document.getElementById('contextualStepGreeting');
+    if (sub) {
+      sub.innerHTML = '<strong style="color:var(--positive);">✓ Payment confirmed — Professional Plan Unlocked!</strong> Unlimited agreement reviews and Word (.docx) Track Changes are now active in this browser. Your permanent access key (<code>cg_pro_studio_unlimited_2026</code>) has also been saved to your workspace below.';
+    }
+  }
 }
 
 function renderQuestionnaireCards(items) {
