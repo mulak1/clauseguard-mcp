@@ -47,6 +47,7 @@ from clauseguard_mcp.questionnaire_engine import (
     autofill_security_questionnaire,
     compare_contract_versions,
 )
+from clauseguard_mcp.studio_pages import render_docs_html
 from clauseguard_mcp.studio_ui import (
     render_privacy_html,
     render_studio_html,
@@ -62,6 +63,7 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title="ClauseGuard MCP",
         version="1.0.0",
+        docs_url="/openapi-docs",
         description=(
             "Commercial Contract Review, Playbook Redlining (Microsoft Word Track Changes .docx), "
             "Draft Comparison & Security Questionnaire Desk."
@@ -71,6 +73,11 @@ def create_app() -> FastAPI:
     @app.get("/", response_class=HTMLResponse)
     def get_studio() -> HTMLResponse:
         return HTMLResponse(content=render_studio_html())
+
+    @app.get("/docs", response_class=HTMLResponse)
+    @app.get("/documentation", response_class=HTMLResponse)
+    def get_public_docs() -> HTMLResponse:
+        return HTMLResponse(content=render_docs_html())
 
     @app.get("/privacy", response_class=HTMLResponse)
     def get_privacy() -> HTMLResponse:

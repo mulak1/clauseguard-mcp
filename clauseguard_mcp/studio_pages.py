@@ -33,7 +33,90 @@ def render_privacy_html() -> str:
     <h2>3. Security &amp; Encryption</h2>
     <p>All connections use TLS 1.3 encryption in transit, and authentication via Claude and ChatGPT uses OAuth 2.1 with S256 PKCE verification.</p>
     <h2>4. Contact</h2>
-    <p>Questions regarding privacy or security reviews may be directed to <strong>support@clauseguard.legal</strong>.</p>
+    <p>Questions regarding privacy, security, or IT administrator reviews may be directed to <strong>mulak1@gmail.com</strong>.</p>
+  </main>
+</body>
+</html>"""
+
+
+def render_docs_html() -> str:
+    """Return the Public User & IT Administrator Documentation page for Claude/ChatGPT MCP review."""
+    return """<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User &amp; IT Admin Documentation — ClauseGuard: Contract Redlines</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif:wght@400&display=swap" rel="stylesheet">
+  <style>
+    body { font-family:'Instrument Sans',system-ui,sans-serif; background:#f9f9f9; color:#1f201d; margin:0; padding:3rem 1.5rem; line-height:1.65; font-size:16px; }
+    main { max-width:820px; margin:0 auto; background:#ffffff; border-radius:22px; padding:2.75rem; }
+    h1 { font-family:'Instrument Serif',Georgia,serif; font-size:2.4rem; font-weight:400; margin:0 0 0.5rem; }
+    h2 { font-size:1.15rem; margin:2rem 0 0.55rem; color:#1b6e66; }
+    p, li { font-size:1rem; color:#1f201d; max-width:68ch; }
+    code { background:#f3f3f2; padding:0.15rem 0.4rem; border-radius:6px; font-size:0.9rem; }
+    table { width:100%; border-collapse:collapse; margin:1rem 0; font-size:0.94rem; }
+    th, td { text-align:left; padding:0.65rem 0.75rem; border-bottom:1px solid #e7e7e5; vertical-align:top; }
+    th { font-weight:600; color:#1b6e66; background:#f9f9f9; }
+    a { color:#1b6e66; text-decoration:none; font-weight:500; }
+  </style>
+</head>
+<body>
+  <main>
+    <p><a href="/">← Return to ClauseGuard Review Desk</a></p>
+    <h1>User &amp; IT Administrator Documentation</h1>
+    <p><strong>Connector Name:</strong> ClauseGuard: Contract Redlines<br/>
+    <strong>Remote MCP Endpoint:</strong> <code>https://clauseguard-mcp-production.up.railway.app/mcp</code><br/>
+    <strong>Support Contact:</strong> <a href="mailto:mulak1@gmail.com">mulak1@gmail.com</a></p>
+
+    <h2>1. Overview for End Users &amp; Legal Teams</h2>
+    <p>ClauseGuard connects directly to Claude and ChatGPT to review commercial agreements (MSAs, Mutual NDAs, SaaS Subscriptions, Data Processing Agreements, and HIPAA BAAs) against plain-English negotiation playbooks. It returns clause-by-clause risk ratings, balanced replacement wording, a ready-to-send negotiation email, and a downloadable Microsoft Word (<code>.docx</code>) file with native Track Changes.</p>
+
+    <h2>2. Security &amp; IT Administrator Review Summary</h2>
+    <ul>
+      <li><strong>100% Read-Only &amp; Idempotent Tools:</strong> All three exposed MCP tools (<code>audit_and_redline_contract</code>, <code>autofill_security_questionnaire</code>, and <code>compare_contract_versions</code>) are strictly stateless, read-only (<code>readOnlyHint: true</code>), and non-destructive (<code>destructiveHint: false</code>). The connector cannot mutate, delete, or modify any external systems or user records.</li>
+      <li><strong>Zero Model Training &amp; Ephemeral Memory:</strong> Submitted contract text and generated <code>.docx</code> Track Changes artifacts are processed in ephemeral memory solely to fulfill the immediate request. No customer contracts or questionnaires are stored in persistent databases or used to train AI models.</li>
+      <li><strong>Transport &amp; Authentication Security:</strong> All traffic is encrypted over HTTPS (TLS 1.3). The server supports open read-only evaluation as well as OAuth 2.1 with S256 PKCE discovery at <code>/.well-known/oauth-authorization-server</code>.</li>
+    </ul>
+
+    <h2>3. Included MCP Tools &amp; Scope</h2>
+    <table>
+      <thead>
+        <tr><th>Tool Name</th><th>Permission Scope</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>audit_and_redline_contract</code></td>
+          <td>Read-Only · Idempotent</td>
+          <td>Reviews commercial contracts against a playbook (<code>founder_friendly</code>, <code>saas_vendor</code>, <code>gdpr_dpa</code>, or <code>hipaa_baa</code>), scores risk (0–100), drafts a negotiation email, and returns a downloadable Microsoft Word (<code>.docx</code>) file with Track Changes.</td>
+        </tr>
+        <tr>
+          <td><code>autofill_security_questionnaire</code></td>
+          <td>Read-Only · Idempotent</td>
+          <td>Drafts plain-English compliance responses and evidence citations across SOC 2 Type II, GDPR, HIPAA, ISO 27001, encryption, incident response, and access control.</td>
+        </tr>
+        <tr>
+          <td><code>compare_contract_versions</code></td>
+          <td>Read-Only · Idempotent</td>
+          <td>Compares two contract drafts clause-by-clause and highlights material shifts in liability caps, payment windows, governing law, auto-renewal, and indemnity.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>4. Example Prompts in Claude</h2>
+    <ul>
+      <li><em>"Use ClauseGuard to review this vendor MSA using the founder_friendly playbook and give me the download link for the redlined Word (.docx) file."</em></li>
+      <li><em>"Compare our original draft against the vendor's returned markup using ClauseGuard and flag any changes to liability or payment terms."</em></li>
+      <li><em>"Use ClauseGuard to complete these 5 customer security questionnaire items."</em></li>
+    </ul>
+
+    <h2>5. Policies &amp; Support</h2>
+    <ul>
+      <li><strong>Privacy &amp; Confidentiality Policy:</strong> <a href="/privacy">https://clauseguard-mcp-production.up.railway.app/privacy</a></li>
+      <li><strong>Terms of Service:</strong> <a href="/terms">https://clauseguard-mcp-production.up.railway.app/terms</a></li>
+      <li><strong>GitHub Repository:</strong> <a href="https://github.com/mulak1/clauseguard-mcp">https://github.com/mulak1/clauseguard-mcp</a></li>
+      <li><strong>Support Email:</strong> <a href="mailto:mulak1@gmail.com">mulak1@gmail.com</a></li>
+    </ul>
   </main>
 </body>
 </html>"""
