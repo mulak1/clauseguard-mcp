@@ -9,6 +9,8 @@ def render_privacy_html() -> str:
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/png" href="/icon.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Privacy &amp; Confidentiality Policy — ClauseGuard</title>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif:wght@400&display=swap" rel="stylesheet">
@@ -45,6 +47,8 @@ def render_docs_html() -> str:
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/png" href="/icon.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>User &amp; IT Admin Documentation — ClauseGuard: Contract Redlines</title>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif:wght@400&display=swap" rel="stylesheet">
@@ -129,6 +133,8 @@ def render_about_html() -> str:
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/png" href="/icon.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>About ClauseGuard — Commercial Contract Review &amp; Word Redlines</title>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif:wght@400&display=swap" rel="stylesheet">
@@ -177,6 +183,8 @@ def render_terms_html() -> str:
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/png" href="/icon.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Terms of Service &amp; Disclaimer — ClauseGuard</title>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif:wght@400&display=swap" rel="stylesheet">

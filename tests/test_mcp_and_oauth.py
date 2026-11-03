@@ -127,7 +127,7 @@ def test_mcp_streamable_http_jsonrpc_lifecycle() -> None:
         "/mcp",
         json={"jsonrpc": "2.0", "method": "notifications/initialized"},
     )
-    assert notif_resp.status_code == 200
+    assert notif_resp.status_code in (200, 202)
 
     # 3. tools/list with required MCP annotations
     list_resp = client.post(

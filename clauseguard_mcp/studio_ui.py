@@ -19,6 +19,9 @@ def render_studio_html() -> str:
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ClauseGuard — Commercial Contract Review, Word Track Changes &amp; Security Desk</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/png" href="/icon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif:wght@400&display=swap" rel="stylesheet">
@@ -65,10 +68,9 @@ def render_studio_html() -> str:
     }}
     .brand {{ display: flex; align-items: center; gap: 0.75rem; }}
     .brand-mark {{
-      width: 34px; height: 34px; border-radius: 8px;
-      background: var(--accent); color: #ffffff;
+      width: 38px; height: 38px; border-radius: 10px;
       display: flex; align-items: center; justify-content: center;
-      font-family: var(--serif); font-size: 1.25rem;
+      flex-shrink: 0;
     }}
     .brand-title {{ font-size: 1rem; font-weight: 600; color: var(--text); }}
     .brand-sub {{ font-size: 0.85rem; color: var(--muted); }}
@@ -335,7 +337,21 @@ def render_studio_html() -> str:
   <header class="topbar">
     <div class="topbar-inner">
       <div class="brand">
-        <div class="brand-mark">C</div>
+        <div class="brand-mark" aria-hidden="true">
+          <svg width="38" height="38" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="48" height="48" rx="11" fill="#09221F" stroke="#1B6E66" stroke-width="2"/>
+            <path d="M24 6L38 10.5V24.5C38 33.5 32 39.5 24 43C16 39.5 10 33.5 10 24.5V10.5L24 6Z" fill="#134E4A" stroke="#5ED4C6" stroke-width="1.5"/>
+            <rect x="14" y="11" width="20" height="24" rx="3" fill="#F8FAFC"/>
+            <rect x="16.5" y="14" width="10" height="2" rx="1" fill="#0F172A"/>
+            <rect x="16.5" y="18" width="15" height="4" rx="1.5" fill="#FEE2E2"/>
+            <rect x="18" y="19.3" width="12" height="1.4" rx="0.7" fill="#DC2626"/>
+            <rect x="16.5" y="23.5" width="15" height="4" rx="1.5" fill="#D1FAE5"/>
+            <rect x="18" y="24.8" width="12" height="1.4" rx="0.7" fill="#059669"/>
+            <rect x="16.5" y="29.5" width="11" height="1.6" rx="0.8" fill="#94A3B8"/>
+            <circle cx="33.5" cy="33.5" r="6.5" fill="#10B981" stroke="#F8FAFC" stroke-width="1.5"/>
+            <path d="M30.8 33.6L32.6 35.4L36.4 31.6" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
         <div>
           <div class="brand-title">ClauseGuard MCP — Commercial Contract &amp; Security Review Desk</div>
           <div class="brand-sub">Plain-English Agreement Review, Word Track Changes (.docx) &amp; Security Questionnaires</div>

@@ -120,6 +120,37 @@ def create_app() -> FastAPI:
     def get_health() -> dict[str, Any]:
         return {"status": "healthy", "service": "ClauseGuard MCP", "port": 8792}
 
+    @app.get("/favicon.svg")
+    def get_favicon_svg() -> Response:
+        svg = (
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">'
+            '<rect width="48" height="48" rx="11" fill="#09221F" stroke="#1B6E66" stroke-width="2"/>'
+            '<path d="M24 6L38 10.5V24.5C38 33.5 32 39.5 24 43C16 39.5 10 33.5 10 24.5V10.5L24 6Z" fill="#134E4A" stroke="#5ED4C6" stroke-width="1.5"/>'
+            '<rect x="14" y="11" width="20" height="24" rx="3" fill="#F8FAFC"/>'
+            '<rect x="16.5" y="14" width="10" height="2" rx="1" fill="#0F172A"/>'
+            '<rect x="16.5" y="18" width="15" height="4" rx="1.5" fill="#FEE2E2"/>'
+            '<rect x="18" y="19.3" width="12" height="1.4" rx="0.7" fill="#DC2626"/>'
+            '<rect x="16.5" y="23.5" width="15" height="4" rx="1.5" fill="#D1FAE5"/>'
+            '<rect x="18" y="24.8" width="12" height="1.4" rx="0.7" fill="#059669"/>'
+            '<circle cx="33.5" cy="33.5" r="6.5" fill="#10B981" stroke="#F8FAFC" stroke-width="1.5"/>'
+            '<path d="M30.8 33.6L32.6 35.4L36.4 31.6" stroke="#FFFFFF" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'
+            "</svg>"
+        )
+        return Response(content=svg, media_type="image/svg+xml")
+
+    @app.get("/favicon.ico")
+    def get_favicon_ico() -> Response:
+        ico_path = ROOT_DIR / "openai_plugin_package" / "assets" / "favicon.ico"
+        if ico_path.exists():
+            return Response(content=ico_path.read_bytes(), media_type="image/x-icon")
+        return get_favicon_svg()
+
+    @app.get("/icon.png")
+    @app.get("/apple-touch-icon.png")
+    def get_icon_png() -> Response:
+        png_path = ROOT_DIR / "openai_plugin_package" / "assets" / "icon.png"
+        return Response(content=png_path.read_bytes(), media_type="image/png")
+
     @app.get("/.well-known/openai-apps-challenge", response_class=PlainTextResponse)
     def get_openai_challenge() -> PlainTextResponse:
         token = _OPENAI_CHALLENGE_STATE.get("token") or os.environ.get("OPENAI_APPS_CHALLENGE", "").strip()
