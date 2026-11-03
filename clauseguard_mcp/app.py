@@ -321,19 +321,47 @@ def create_app() -> FastAPI:
         path = ROOT_DIR / "openai-mcp-app.json"
         return JSONResponse(content=json.loads(path.read_text(encoding="utf-8")))
 
+    @app.post("/api/chatgpt/audit")
+    async def api_chatgpt_audit(request: Request) -> JSONResponse:
+        try:
+            raw = await request.json()
+            audit_req = AuditContractRequest(**raw)
+        except (ValidationError, ValueError) as exc:
+            return JSONResponse(status_code=422, content={"success": False, "error": str(exc)})
+        res = audit_and_redline_contract(audit_req)
+        audit_dict = res.model_dump(mode="json", exclude={"docx_base64"})
+        audit_dict["public_download_url"] = f"https://clauseguard-mcp-production.up.railway.app{res.download_url}"
+        audit_dict["web_review_desk_url"] = "https://clauseguard-mcp-production.up.railway.app"
+        return JSONResponse(status_code=200, content={"success": True, "audit": audit_dict})
+
     @app.get("/chatgpt-openapi.json")
     def get_chatgpt_openapi() -> JSONResponse:
+        ok_resp = {
+            "200": {
+                "description": "Successful plain-English review response.",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "success": {"type": "boolean"},
+                            },
+                        }
+                    }
+                },
+            }
+        }
         return JSONResponse(
             content={
                 "openapi": "3.1.0",
                 "info": {
-                    "title": "ClauseGuard — Contract Review & Word Redlines",
+                    "title": "ClauseGuard: Contract Redlines",
                     "description": "Review commercial agreements in plain English, generate Microsoft Word (.docx) files with native Track Changes, compare contract versions, and complete customer security questionnaires.",
                     "version": "1.0.0",
                 },
                 "servers": [{"url": "https://clauseguard-mcp-production.up.railway.app"}],
                 "paths": {
-                    "/api/audit": {
+                    "/api/chatgpt/audit": {
                         "post": {
                             "operationId": "auditAndRedlineContract",
                             "summary": "Review a contract against a negotiation playbook and generate a downloadable Word (.docx) file with Track Changes.",
@@ -348,23 +376,25 @@ def create_app() -> FastAPI:
                                             "properties": {
                                                 "contract_text": {
                                                     "type": "string",
-                                                    "description": "Full text or clauses of the agreement to review.",
+                                                    "description": "Full plain-text wording of the commercial contract to review and redline.",
                                                 },
                                                 "playbook": {
                                                     "type": "string",
                                                     "enum": ["founder_friendly", "saas_vendor", "gdpr_dpa", "hipaa_baa"],
                                                     "default": "founder_friendly",
+                                                    "description": "Negotiation playbook to apply: founder_friendly, saas_vendor, gdpr_dpa, or hipaa_baa.",
                                                 },
                                                 "contract_name": {
                                                     "type": "string",
                                                     "default": "Agreement_Redlined.docx",
+                                                    "description": "Filename for the generated Microsoft Word (.docx) Track Changes document.",
                                                 },
                                             },
                                         }
                                     }
                                 },
                             },
-                            "responses": {"200": {"description": "Plain-English contract review, risk score, and Word (.docx) Track Changes download URL."}},
+                            "responses": ok_resp,
                         }
                     },
                     "/api/questionnaire": {
@@ -382,12 +412,13 @@ def create_app() -> FastAPI:
                                             "properties": {
                                                 "items": {
                                                     "type": "array",
+                                                    "description": "List of customer security or privacy questionnaire items to answer.",
                                                     "items": {
                                                         "type": "object",
                                                         "required": ["id", "question"],
                                                         "properties": {
-                                                            "id": {"type": "string"},
-                                                            "question": {"type": "string"},
+                                                            "id": {"type": "string", "description": "Question identifier (e.g., Q-01)."},
+                                                            "question": {"type": "string", "description": "Full text of the security question."},
                                                         },
                                                     },
                                                 }
@@ -396,7 +427,7 @@ def create_app() -> FastAPI:
                                     }
                                 },
                             },
-                            "responses": {"200": {"description": "Completed security questionnaire responses with confidence scores."}},
+                            "responses": ok_resp,
                         }
                     },
                     "/api/compare": {
@@ -412,16 +443,16 @@ def create_app() -> FastAPI:
                                             "type": "object",
                                             "required": ["version_a_text", "version_b_text"],
                                             "properties": {
-                                                "version_a_text": {"type": "string"},
-                                                "version_b_text": {"type": "string"},
-                                                "version_a_name": {"type": "string", "default": "Initial_Agreement_Draft.docx"},
-                                                "version_b_name": {"type": "string", "default": "Counterparty_Returned_Markup.docx"},
+                                                "version_a_text": {"type": "string", "description": "Original baseline contract draft text."},
+                                                "version_b_text": {"type": "string", "description": "Revised counterparty contract draft text."},
+                                                "version_a_name": {"type": "string", "default": "Initial_Agreement_Draft.docx", "description": "Baseline draft filename."},
+                                                "version_b_name": {"type": "string", "default": "Counterparty_Returned_Markup.docx", "description": "Revised draft filename."},
                                             },
                                         }
                                     }
                                 },
                             },
-                            "responses": {"200": {"description": "Section-by-section comparison and material risk shifts."}},
+                            "responses": ok_resp,
                         }
                     },
                 },
