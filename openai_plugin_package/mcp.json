@@ -1,0 +1,9 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "clauseguard": {
+      "type": "streamable-http",
+      "url": "https://clauseguard-mcp-production.up.railway.app/mcp"
+    }
+  }
+}

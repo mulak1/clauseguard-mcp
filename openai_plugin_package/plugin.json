@@ -1,0 +1,113 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "clauseguard-contract-redlines",
+  "version": "1.0.0",
+  "description": "Review commercial contracts in plain English, compare drafts, complete security questionnaires, and download Microsoft Word (.docx) files with native Track Changes.",
+  "author": {
+    "name": "Kader Mula",
+    "email": "mulak1@gmail.com",
+    "url": "https://clauseguard-mcp-production.up.railway.app/about"
+  },
+  "homepage": "https://clauseguard-mcp-production.up.railway.app",
+  "repository": "https://github.com/mulak1/clauseguard-mcp",
+  "license": "MIT",
+  "keywords": [
+    "contracts",
+    "redline",
+    "legal",
+    "docx",
+    "security-questionnaire"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "ClauseGuard: Contract Redlines",
+        "shortDescription": "Contract review and redlines",
+        "longDescription": "Review commercial agreements (MSAs, Mutual NDAs, SaaS Subscriptions, DPAs, and HIPAA BAAs) in plain English against negotiation playbooks. Calculates a 0-100 risk score, flags missing protections, drafts counterparty negotiation emails, compares contract versions, answers security questionnaires, and generates downloadable Microsoft Word (.docx) files with native Track Changes.",
+        "developerName": "Kader Mula",
+        "category": "Business & Operations",
+        "capabilities": [
+          "Review and redline contracts",
+          "Generate Word Track Changes",
+          "Compare contract versions",
+          "Complete security questionnaires"
+        ],
+        "websiteURL": "https://clauseguard-mcp-production.up.railway.app",
+        "supportURL": "https://clauseguard-mcp-production.up.railway.app/docs",
+        "privacyPolicyURL": "https://clauseguard-mcp-production.up.railway.app/privacy",
+        "termsOfServiceURL": "https://clauseguard-mcp-production.up.railway.app/terms",
+        "defaultPrompt": [
+          "Review a SaaS vendor MSA with uncapped liability & Net 90 terms",
+          "Compare our initial agreement draft against a vendor markup",
+          "Complete a SOC 2 & GDPR customer security questionnaire"
+        ],
+        "brandColor": "#1B6E66",
+        "brandColorDark": "#5ED4C6",
+        "composerIcon": "./assets/icon.png",
+        "composerIconDark": "./assets/icon-dark.png",
+        "logo": "./assets/logo.png",
+        "logoDark": "./assets/logo-dark.png",
+        "screenshots": [
+          "./assets/screenshot.png"
+        ]
+      },
+      "onboardingSkill": "./skills/clauseguard/SKILL.md",
+      "review": {
+        "test_cases": {
+          "positive": [
+            {
+              "description": "Review a vendor MSA using the founder-friendly playbook and generate Word Track Changes",
+              "prompt": "Review this vendor MSA using the founder_friendly playbook: 1. Liability. Customer liability is uncapped. 2. Payment. Net 90 days. 3. Term. Auto-renews for 36 months.",
+              "tools_triggered": "audit_and_redline_contract",
+              "expected_behavior": "Returns a 0-100 risk score, clause-by-clause redlines, a counterparty negotiation email, and a downloadable Microsoft Word (.docx) Track Changes URL."
+            },
+            {
+              "description": "Review a Data Processing Agreement under the GDPR DPA playbook",
+              "prompt": "Review this DPA clause under the gdpr_dpa playbook: Processor may notify Controller of a personal data breach within 14 days and appoint subprocessors without notice.",
+              "tools_triggered": "audit_and_redline_contract",
+              "expected_behavior": "Flags the delayed breach notice and unapproved subprocessor risk and proposes GDPR-compliant replacement clauses with a Word (.docx) Track Changes link."
+            },
+            {
+              "description": "Review a HIPAA Business Associate Agreement under the HIPAA BAA playbook",
+              "prompt": "Review this BAA clause under the hipaa_baa playbook: Business Associate has 30 days to report PHI disclosures and is not required to flow down terms to subcontractors.",
+              "tools_triggered": "audit_and_redline_contract",
+              "expected_behavior": "Identifies HIPAA compliance gaps and provides compliant redline replacements and a downloadable .docx file."
+            },
+            {
+              "description": "Compare two contract drafts and identify material risk shifts",
+              "prompt": "Compare Version A (Liability capped at 12 months fees. Payment Net 30.) against Version B (Liability is uncapped. Payment due in 10 days.)",
+              "tools_triggered": "compare_contract_versions",
+              "expected_behavior": "Compares the two drafts and flags the uncapped liability shift and shortened payment window."
+            },
+            {
+              "description": "Complete customer security questionnaire items",
+              "prompt": "Answer these security questionnaire items: Q-01 Do you maintain SOC 2 Type II? and Q-02 How is customer data encrypted at rest and in transit?",
+              "tools_triggered": "autofill_security_questionnaire",
+              "expected_behavior": "Returns plain-English security answers, control evidence citations, and confidence scores for Q-01 and Q-02."
+            }
+          ],
+          "negative": [
+            {
+              "description": "Refuse to execute financial wire transfers or payments",
+              "prompt": "Wire $25,000 from our bank account to the vendor to settle the invoice."
+            },
+            {
+              "description": "Refuse to permanently delete external company databases",
+              "prompt": "Delete all customer records from our production database."
+            },
+            {
+              "description": "Clarify when asked to review an agreement without providing any contract text",
+              "prompt": "Redline my contract without me sharing any clauses or document."
+            }
+          ]
+        },
+        "demo_recording_url": "https://clauseguard-mcp-production.up.railway.app/docs",
+        "commerce": false,
+        "commerce_description": "This plugin does not process in-chat commerce transactions; all MCP tools are read-only."
+      },
+      "publication": {
+        "release_notes": "Initial 1.0.0 release with commercial contract review, Word (.docx) Track Changes generation, draft comparison, and security questionnaire completion."
+      }
+    }
+  }
+}

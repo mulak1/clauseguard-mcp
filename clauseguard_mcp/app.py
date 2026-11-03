@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qs
 
 from fastapi import FastAPI, Header, Query, Request, Response
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse
 from pydantic import ValidationError
 import uvicorn
 
@@ -62,6 +63,9 @@ from clauseguard_mcp.studio_ui import (
 
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
+_OPENAI_CHALLENGE_STATE: dict[str, str] = {
+    "token": os.environ.get("OPENAI_APPS_CHALLENGE", "").strip()
+}
 
 
 def create_app() -> FastAPI:
@@ -112,6 +116,29 @@ def create_app() -> FastAPI:
     @app.get("/health")
     def get_health() -> dict[str, Any]:
         return {"status": "healthy", "service": "ClauseGuard MCP", "port": 8792}
+
+    @app.get("/.well-known/openai-apps-challenge", response_class=PlainTextResponse)
+    def get_openai_challenge() -> PlainTextResponse:
+        token = _OPENAI_CHALLENGE_STATE.get("token") or os.environ.get("OPENAI_APPS_CHALLENGE", "").strip()
+        return PlainTextResponse(content=token)
+
+    @app.post("/api/admin/openai-challenge")
+    async def set_openai_challenge(request: Request) -> JSONResponse:
+        raw = await request.json()
+        token = str(raw.get("token", "")).strip()
+        _OPENAI_CHALLENGE_STATE["token"] = token
+        return JSONResponse(status_code=200, content={"success": True, "token": token})
+
+    @app.get("/openai-plugin.zip")
+    def download_openai_plugin_zip() -> Response:
+        zip_path = ROOT_DIR / "clauseguard-openai-plugin.zip"
+        if not zip_path.exists():
+            return JSONResponse(status_code=404, content={"error": "ZIP not found"})
+        return Response(
+            content=zip_path.read_bytes(),
+            media_type="application/zip",
+            headers={"Content-Disposition": 'attachment; filename="clauseguard-openai-plugin.zip"'},
+        )
 
     @app.get("/.well-known/oauth-authorization-server")
     def oauth_discovery(request: Request) -> dict[str, Any]:
