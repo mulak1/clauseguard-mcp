@@ -25,10 +25,10 @@ MCP_TOOLS_CATALOG: tuple[dict[str, Any], ...] = (
         "name": "audit_and_redline_contract",
         "title": "Review & Redline Contract",
         "description": (
-            "Reviews commercial agreements (MSA, NDA, SaaS Subscription, Data Processing Agreement, "
-            "or Business Associate Agreement) against a plain-English legal playbook, calculates a "
-            "0–100 risk score, proposes balanced replacement wording, drafts a negotiation email, "
-            "and provides a downloadable Microsoft Word (.docx) file with native Track Changes."
+            "Analyzes commercial agreements (MSA, Mutual NDA, SaaS Subscription, or Data Processing "
+            "Agreement) in plain English against a negotiation playbook, calculates a 0–100 risk score, "
+            "flags missing protections, and returns clause-by-clause replacement wording and a draft "
+            "counterparty negotiation summary without modifying external systems."
         ),
         "annotations": {
             "title": "Review & Redline Contract",
@@ -39,30 +39,27 @@ MCP_TOOLS_CATALOG: tuple[dict[str, Any], ...] = (
         },
         "inputSchema": {
             "type": "object",
+            "required": ["contract_text"],
             "properties": {
                 "contract_text": {
                     "type": "string",
-                    "description": "Full plain-text wording of the commercial contract to review and redline.",
-                },
-                "docx_base64": {
-                    "type": "string",
-                    "description": "Optional base64-encoded Microsoft Word (.docx) document to review and redline.",
+                    "description": "Full plain-text wording of the commercial contract to review.",
                 },
                 "playbook": {
                     "type": "string",
                     "enum": ["founder_friendly", "saas_vendor", "gdpr_dpa", "hipaa_baa"],
                     "default": "founder_friendly",
-                    "description": "Negotiation playbook to apply: founder_friendly, saas_vendor, gdpr_dpa, or hipaa_baa.",
+                    "description": "Negotiation playbook to evaluate against: founder_friendly, saas_vendor, gdpr_dpa, or hipaa_baa.",
                 },
                 "contract_name": {
                     "type": "string",
                     "default": "Contract_Redlined.docx",
-                    "description": "Filename for the generated Microsoft Word (.docx) Track Changes document.",
+                    "description": "Document label for the contract review report.",
                 },
                 "author": {
                     "type": "string",
                     "default": "ClauseGuard Legal Desk",
-                    "description": "Reviewer name displayed inside Microsoft Word Track Changes markup.",
+                    "description": "Reviewer label displayed in the redline summary.",
                 },
             },
         },
