@@ -12,6 +12,12 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import ValidationError
 import uvicorn
 
+from clauseguard_mcp.analytics import (
+    detect_source,
+    get_analytics_snapshot,
+    record_event,
+    render_analytics_html,
+)
 from clauseguard_mcp.audit_engine import (
     audit_and_redline_contract,
     build_custom_redlined_docx,
@@ -71,8 +77,20 @@ def create_app() -> FastAPI:
     )
 
     @app.get("/", response_class=HTMLResponse)
-    def get_studio() -> HTMLResponse:
+    def get_studio(request: Request) -> HTMLResponse:
+        if "pro_activated=1" in str(request.url.query):
+            record_event(event_type="pro_unlock", source="Web Desk", detail="Stripe Redirect")
+        else:
+            record_event(event_type="page_view", source="Web Desk", detail="/")
         return HTMLResponse(content=render_studio_html())
+
+    @app.get("/analytics", response_class=HTMLResponse)
+    def get_analytics_page() -> HTMLResponse:
+        return HTMLResponse(content=render_analytics_html())
+
+    @app.get("/api/analytics")
+    def get_analytics_json() -> dict[str, Any]:
+        return get_analytics_snapshot()
 
     @app.get("/about", response_class=HTMLResponse)
     def get_about() -> HTMLResponse:
@@ -186,6 +204,21 @@ def create_app() -> FastAPI:
                 status_code=200,
                 content={"jsonrpc": "2.0", "id": None, "error": {"code": -32700, "message": "Parse error"}},
             )
+        method = str(payload.get("method", ""))
+        params = payload.get("params") or {}
+        client_info = params.get("clientInfo") or {}
+        src = detect_source(
+            request.headers.get("user-agent", ""),
+            path="/mcp",
+            client_name=str(client_info.get("name", "")),
+        )
+        if method in ("initialize", "tools/list"):
+            record_event(event_type="mcp_connect", source=src, detail=method)
+        elif method == "tools/call":
+            t_name = str(params.get("name", "-"))
+            t_args = params.get("arguments") or {}
+            pb = str(t_args.get("playbook", "")) if isinstance(t_args, dict) else ""
+            record_event(event_type="tool_call", source=src, tool_name=t_name, detail=pb or "MCP tool")
         return JSONResponse(status_code=200, content=handle_mcp_jsonrpc(payload))
 
     @app.get("/api/samples")
@@ -268,6 +301,13 @@ def create_app() -> FastAPI:
             )
 
         res = audit_and_redline_contract(audit_req)
+        src = detect_source(request.headers.get("user-agent", ""), path="/api/audit")
+        record_event(
+            event_type="tool_call",
+            source=src,
+            tool_name="audit_and_redline_contract",
+            detail=audit_req.playbook,
+        )
         audit_dict = res.model_dump(mode="json")
         audit_dict["public_download_url"] = f"https://clauseguard-mcp-production.up.railway.app{res.download_url}"
         return JSONResponse(
@@ -285,6 +325,13 @@ def create_app() -> FastAPI:
             raw = await request.json()
             q_req = QuestionnaireRequest(**raw)
             res = autofill_security_questionnaire(q_req)
+            src = detect_source(request.headers.get("user-agent", ""), path="/api/questionnaire")
+            record_event(
+                event_type="tool_call",
+                source=src,
+                tool_name="autofill_security_questionnaire",
+                detail=f"{len(q_req.items)} items",
+            )
             return JSONResponse(status_code=200, content={"success": True, "result": res.model_dump(mode="json")})
         except (ValidationError, ValueError) as exc:
             return JSONResponse(status_code=422, content={"success": False, "error": str(exc)})
@@ -295,16 +342,25 @@ def create_app() -> FastAPI:
             raw = await request.json()
             c_req = CompareVersionsRequest(**raw)
             res = compare_contract_versions(c_req)
+            src = detect_source(request.headers.get("user-agent", ""), path="/api/compare")
+            record_event(
+                event_type="tool_call",
+                source=src,
+                tool_name="compare_contract_versions",
+                detail="draft diff",
+            )
             return JSONResponse(status_code=200, content={"success": True, "result": res.model_dump(mode="json")})
         except (ValidationError, ValueError) as exc:
             return JSONResponse(status_code=422, content={"success": False, "error": str(exc)})
 
     @app.get("/api/docx/{doc_id}")
-    def download_docx(doc_id: str) -> Response:
+    def download_docx(doc_id: str, request: Request) -> Response:
         artifact = get_docx_artifact(doc_id)
         if artifact is None:
             return JSONResponse(status_code=404, content={"error": "Document artifact not found"})
         filename, docx_bytes = artifact
+        src = detect_source(request.headers.get("user-agent", ""), path="/api/docx")
+        record_event(event_type="docx_download", source=src, tool_name="download_docx", detail=filename)
         return Response(
             content=docx_bytes,
             media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -329,6 +385,12 @@ def create_app() -> FastAPI:
         except (ValidationError, ValueError) as exc:
             return JSONResponse(status_code=422, content={"success": False, "error": str(exc)})
         res = audit_and_redline_contract(audit_req)
+        record_event(
+            event_type="tool_call",
+            source="ChatGPT",
+            tool_name="audit_and_redline_contract",
+            detail=audit_req.playbook,
+        )
         audit_dict = res.model_dump(mode="json", exclude={"docx_base64"})
         audit_dict["public_download_url"] = f"https://clauseguard-mcp-production.up.railway.app{res.download_url}"
         audit_dict["web_review_desk_url"] = "https://clauseguard-mcp-production.up.railway.app"
