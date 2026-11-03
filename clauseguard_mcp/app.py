@@ -64,7 +64,10 @@ from clauseguard_mcp.studio_ui import (
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 _OPENAI_CHALLENGE_STATE: dict[str, str] = {
-    "token": os.environ.get("OPENAI_APPS_CHALLENGE", "").strip()
+    "token": os.environ.get(
+        "OPENAI_APPS_CHALLENGE",
+        "jDYn4kfcZr0xfWceFTluiSzrrbhKoQiuKn3d_MPUPNE",
+    ).strip()
 }
 
 
