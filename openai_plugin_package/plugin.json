@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "clauseguard-contract-redlines",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Review commercial contracts in plain English, compare drafts, complete security questionnaires, and download Microsoft Word (.docx) files with native Track Changes.",
   "author": {
     "name": "Kader Mula",

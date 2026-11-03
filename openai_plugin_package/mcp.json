@@ -3,7 +3,14 @@
   "mcpServers": {
     "clauseguard": {
       "type": "streamable-http",
-      "url": "https://clauseguard-mcp-production.up.railway.app/mcp"
+      "url": "https://clauseguard-mcp-production.up.railway.app/mcp",
+      "extensions": {
+        "com.openai": {
+          "auth": {
+            "type": "none"
+          }
+        }
+      }
     }
   }
 }

@@ -144,11 +144,13 @@ def create_app() -> FastAPI:
         )
 
     @app.get("/.well-known/oauth-authorization-server")
-    def oauth_discovery(request: Request) -> dict[str, Any]:
+    def oauth_discovery(request: Request) -> Response:
         base_url = str(request.base_url).rstrip("/")
-        if request.headers.get("x-forwarded-proto") == "https" or "railway.app" in base_url:
-            base_url = base_url.replace("http://", "https://", 1)
-        return get_oauth_metadata(base_url)
+        if (
+            request.headers.get("x-forwarded-proto") == "https" or "railway.app" in base_url
+        ) and request.query_params.get("oauth") != "1":
+            return JSONResponse(status_code=404, content={"detail": "No authentication required for this MCP server."})
+        return JSONResponse(status_code=200, content=get_oauth_metadata(base_url))
 
     @app.get("/oauth/authorize")
     def oauth_authorize(
@@ -226,7 +228,7 @@ def create_app() -> FastAPI:
         }
 
     @app.post("/mcp")
-    async def mcp_jsonrpc_endpoint(request: Request) -> JSONResponse:
+    async def mcp_jsonrpc_endpoint(request: Request) -> Response:
         try:
             payload = await request.json()
         except Exception:
@@ -234,6 +236,17 @@ def create_app() -> FastAPI:
                 status_code=200,
                 content={"jsonrpc": "2.0", "id": None, "error": {"code": -32700, "message": "Parse error"}},
             )
+        if isinstance(payload, list):
+            results = []
+            for item in payload:
+                if isinstance(item, dict) and item.get("id") is None and str(item.get("method", "")).startswith("notifications/"):
+                    continue
+                if isinstance(item, dict):
+                    results.append(handle_mcp_jsonrpc(item))
+            if not results:
+                return Response(status_code=202)
+            return JSONResponse(status_code=200, content=results)
+
         method = str(payload.get("method", ""))
         params = payload.get("params") or {}
         client_info = params.get("clientInfo") or {}
@@ -249,6 +262,10 @@ def create_app() -> FastAPI:
             t_args = params.get("arguments") or {}
             pb = str(t_args.get("playbook", "")) if isinstance(t_args, dict) else ""
             record_event(event_type="tool_call", source=src, tool_name=t_name, detail=pb or "MCP tool")
+
+        if payload.get("id") is None and method.startswith("notifications/"):
+            return Response(status_code=202)
+
         return JSONResponse(status_code=200, content=handle_mcp_jsonrpc(payload))
 
     @app.get("/api/samples")
