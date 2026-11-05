@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hmac
 import json
 import os
 from pathlib import Path
@@ -84,6 +85,33 @@ def create_app() -> FastAPI:
         ),
     )
 
+    _SECURITY_HEADERS = {
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Referrer-Policy": "strict-origin-when-cross-origin",
+        "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=()",
+        "Cross-Origin-Opener-Policy": "same-origin",
+        "Content-Security-Policy": "base-uri 'self'; object-src 'none'; frame-ancestors 'none'",
+    }
+
+    @app.middleware("http")
+    async def security_headers_and_size_cap_middleware(
+        request: Request, call_next: Any
+    ) -> Response:
+        cl_header = request.headers.get("content-length")
+        if cl_header and cl_header.isdigit() and int(cl_header) > 5_000_000:
+            resp: Response = JSONResponse(
+                status_code=413, content={"error": "Payload too large"}
+            )
+            for k, v in _SECURITY_HEADERS.items():
+                resp.headers[k] = v
+            return resp
+        response: Response = await call_next(request)
+        for k, v in _SECURITY_HEADERS.items():
+            response.headers[k] = v
+        return response
+
     @app.get("/", response_class=HTMLResponse)
     def get_studio(request: Request) -> HTMLResponse:
         if "pro_activated=1" in str(request.url.query):
@@ -159,6 +187,23 @@ def create_app() -> FastAPI:
 
     @app.post("/api/admin/openai-challenge")
     async def set_openai_challenge(request: Request) -> JSONResponse:
+        expected_secret = os.environ.get("ADMIN_API_SECRET", "").strip()
+        auth_header = (request.headers.get("authorization") or "").strip()
+        bearer_secret = (
+            auth_header[7:].strip()
+            if auth_header.lower().startswith("bearer ")
+            else ""
+        )
+        provided_secret = (
+            request.headers.get("x-admin-secret") or bearer_secret or ""
+        ).strip()
+        if not expected_secret or not hmac.compare_digest(
+            provided_secret, expected_secret
+        ):
+            return JSONResponse(
+                status_code=403,
+                content={"error": "Forbidden: valid admin secret required"},
+            )
         raw = await request.json()
         token = str(raw.get("token", "")).strip()
         _OPENAI_CHALLENGE_STATE["token"] = token

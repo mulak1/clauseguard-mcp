@@ -34,6 +34,9 @@ def store_docx_artifact(filename: str, docx_bytes: bytes) -> str:
     doc_id = f"doc_{uuid.uuid4().hex[:12]}"
     safe_name = sanitize_docx_filename(filename)
     _DOCX_STORE[doc_id] = (safe_name, docx_bytes)
+    if len(_DOCX_STORE) > 60:
+        oldest_doc = next(iter(_DOCX_STORE))
+        _DOCX_STORE.pop(oldest_doc, None)
     _FILENAME_STORE[safe_name] = (safe_name, docx_bytes)
     _FILENAME_STORE[f"{doc_id}_{safe_name}"] = (safe_name, docx_bytes)
     if len(_FILENAME_STORE) > 60:
@@ -61,13 +64,22 @@ def get_docx_by_filename(filename: str) -> tuple[str, bytes] | None:
 
 def extract_text_from_docx_bytes(docx_bytes: bytes) -> str:
     """Extract paragraph text safely from a .docx ZIP payload."""
+    if len(docx_bytes) > 5_000_000:
+        raise ValueError("Invalid .docx payload: exceeds 5 MB size limit")
     try:
         with zipfile.ZipFile(io.BytesIO(docx_bytes), "r") as zf:
             if "word/document.xml" not in zf.namelist():
                 raise ValueError("Invalid .docx archive: missing word/document.xml")
+            info = zf.getinfo("word/document.xml")
+            if info.file_size > 10_000_000:
+                raise ValueError("Invalid .docx archive: uncompressed XML exceeds 10 MB limit")
             xml_bytes = zf.read("word/document.xml")
     except zipfile.BadZipFile as exc:
         raise ValueError("Invalid .docx payload: not a valid ZIP archive") from exc
+
+    lower_xml = xml_bytes.lower()
+    if b"<!doctype" in lower_xml or b"<!entity" in lower_xml:
+        raise ValueError("Invalid .docx XML: external entities or DOCTYPE declarations are forbidden")
 
     try:
         root = ET.fromstring(xml_bytes)

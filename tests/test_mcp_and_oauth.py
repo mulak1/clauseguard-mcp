@@ -505,4 +505,114 @@ def test_p0_forgiving_cold_call_coercion_and_downloads_link() -> None:
     assert "error" not in cold_diff.json()
 
 
+def test_cloudflare_and_application_security_hardening(monkeypatch: object) -> None:
+    """Verify admin challenge auth, analytics XSS escaping, .docx XXE/size guards, and security headers."""
+    import io
+    import os
+    import zipfile
+    import pytest
+    from clauseguard_mcp.docx_engine import (
+        _DOCX_STORE,
+        extract_text_from_docx_bytes,
+        store_docx_artifact,
+    )
+
+    client = TestClient(create_app())
+
+    # 1. Verify Cloudflare / OWASP security headers on responses
+    home_resp = client.get("/")
+    assert home_resp.status_code == 200
+    assert (
+        home_resp.headers["Strict-Transport-Security"]
+        == "max-age=31536000; includeSubDomains; preload"
+    )
+    assert home_resp.headers["X-Content-Type-Options"] == "nosniff"
+    assert home_resp.headers["X-Frame-Options"] == "DENY"
+    assert home_resp.headers["Referrer-Policy"] == "strict-origin-when-cross-origin"
+    assert (
+        home_resp.headers["Permissions-Policy"]
+        == "camera=(), microphone=(), geolocation=(), payment=()"
+    )
+    assert home_resp.headers["Cross-Origin-Opener-Policy"] == "same-origin"
+    assert (
+        home_resp.headers["Content-Security-Policy"]
+        == "base-uri 'self'; object-src 'none'; frame-ancestors 'none'"
+    )
+
+    # 2. Verify 413 Payload Too Large when Content-Length > 5_000_000
+    oversized_resp = client.post(
+        "/mcp",
+        content=b"{}",
+        headers={
+            "Content-Type": "application/json",
+            "Content-Length": "6000000",
+        },
+    )
+    assert oversized_resp.status_code == 413
+    assert oversized_resp.headers["X-Content-Type-Options"] == "nosniff"
+
+    # 3. Verify POST /api/admin/openai-challenge requires ADMIN_API_SECRET
+    unauth_resp = client.post(
+        "/api/admin/openai-challenge", json={"token": "malicious_override"}
+    )
+    assert unauth_resp.status_code == 403
+    assert (
+        client.get("/.well-known/openai-apps-challenge").text
+        == "jDYn4kfcZr0xfWceFTluiSzrrbhKoQiuKn3d_MPUPNE"
+    )
+
+    os.environ["ADMIN_API_SECRET"] = "test_super_secret_admin_key"
+    try:
+        wrong_resp = client.post(
+            "/api/admin/openai-challenge",
+            json={"token": "malicious_override"},
+            headers={"X-Admin-Secret": "wrong_secret"},
+        )
+        assert wrong_resp.status_code == 403
+
+        valid_resp = client.post(
+            "/api/admin/openai-challenge",
+            json={"token": "jDYn4kfcZr0xfWceFTluiSzrrbhKoQiuKn3d_MPUPNE"},
+            headers={"X-Admin-Secret": "test_super_secret_admin_key"},
+        )
+        assert valid_resp.status_code == 200
+    finally:
+        os.environ.pop("ADMIN_API_SECRET", None)
+
+    # 4. Verify Stored XSS escaping in /analytics
+    client.post(
+        "/mcp",
+        json={
+            "jsonrpc": "2.0",
+            "id": 999,
+            "method": "tools/call",
+            "params": {
+                "name": "<script>alert('xss')</script>",
+                "arguments": {"playbook": "<img src=x onerror=alert(1)>"},
+            },
+        },
+    )
+    analytics_html = client.get("/analytics").text
+    assert "<script>alert('xss')</script>" not in analytics_html
+    assert "&lt;script&gt;alert(&#x27;xss&#x27;)&lt;/script&gt;" in analytics_html
+
+    # 5. Verify _DOCX_STORE eviction cap (<= 60) and .docx XXE / size guards
+    for i in range(65):
+        store_docx_artifact(f"evict_{i}.docx", b"PK\x03\x04dummy")
+    assert len(_DOCX_STORE) <= 60
+
+    with pytest.raises(ValueError, match="exceeds 5 MB"):
+        extract_text_from_docx_bytes(b"x" * 5_000_001)
+
+    xxe_buf = io.BytesIO()
+    with zipfile.ZipFile(xxe_buf, "w") as zf:
+        zf.writestr(
+            "word/document.xml",
+            b'<?xml version="1.0"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "file:///etc/passwd">]><w:document/>',
+        )
+    with pytest.raises(ValueError, match="external entities or DOCTYPE"):
+        extract_text_from_docx_bytes(xxe_buf.getvalue())
+
+
+
 

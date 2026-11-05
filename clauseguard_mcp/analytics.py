@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from collections import deque
 from datetime import datetime, timezone
+import html
 from typing import Any
 
 
@@ -85,13 +86,15 @@ def record_event(
     elif event_type == "pro_unlock":
         _COUNTERS["pro_unlocks"] += 1
 
+    safe_tool = str(tool_name or "-")[:80]
+    safe_detail = str(detail or "-")[:80]
     _RECENT_EVENTS.appendleft(
         {
             "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
-            "source": source,
-            "event": event_type,
-            "tool": tool_name,
-            "detail": detail or "-",
+            "source": str(source)[:80],
+            "event": str(event_type)[:80],
+            "tool": safe_tool,
+            "detail": safe_detail,
         }
     )
 
@@ -115,8 +118,11 @@ def render_analytics_html() -> str:
     tools = snap["by_tool"]
     pbs = snap["by_playbook"]
     rows = "".join(
-        f"<tr><td>{ev['timestamp']}</td><td><strong>{ev['source']}</strong></td>"
-        f"<td>{ev['event']}</td><td><code>{ev['tool']}</code></td><td>{ev['detail']}</td></tr>"
+        f"<tr><td>{html.escape(str(ev['timestamp']), quote=True)}</td>"
+        f"<td><strong>{html.escape(str(ev['source']), quote=True)}</strong></td>"
+        f"<td>{html.escape(str(ev['event']), quote=True)}</td>"
+        f"<td><code>{html.escape(str(ev['tool']), quote=True)}</code></td>"
+        f"<td>{html.escape(str(ev['detail']), quote=True)}</td></tr>"
         for ev in snap["recent_events"]
     ) or '<tr><td colspan="5" style="color:#666;">No events recorded yet in this container session.</td></tr>'
 
