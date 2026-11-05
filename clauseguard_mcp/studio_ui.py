@@ -161,20 +161,95 @@ def render_studio_html() -> str:
       width: 100%;
       text-align: left;
       background: var(--raised);
-      border: none;
-      border-radius: 8px;
+      border: 1.5px solid transparent;
+      border-radius: 10px;
       padding: 0.7rem 0.9rem;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       gap: 0.15rem;
       color: var(--text);
+      position: relative;
+      transition: all 0.15s ease;
     }}
-    .sample-btn:hover, .sample-btn.active-sample {{
+    .sample-btn:hover {{
+      background: #eef6f5;
+      border-color: #b7dad6;
+    }}
+    .sample-btn.active-sample {{
       background: #e8f3f1;
+      border-color: var(--accent);
+      box-shadow: 0 2px 8px rgba(27, 110, 102, 0.08);
     }}
+    .sample-btn .s-badge {{
+      display: none;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--accent);
+      background: #d1ece8;
+      padding: 0.12rem 0.5rem;
+      border-radius: 999px;
+      align-self: flex-start;
+      margin-bottom: 0.15rem;
+    }}
+    .sample-btn.active-sample .s-badge {{ display: inline-block; }}
     .sample-btn .s-title {{ font-size: 0.9rem; font-weight: 600; color: var(--text); }}
     .sample-btn .s-sub {{ font-size: 0.84rem; color: var(--muted); }}
+    .step-badge {{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--accent);
+      color: #ffffff;
+      font-size: 0.76rem;
+      font-weight: 600;
+      padding: 0.15rem 0.55rem;
+      border-radius: 999px;
+      margin-right: 0.4rem;
+    }}
+    .sticky-export-bar {{
+      position: sticky;
+      bottom: 14px;
+      z-index: 40;
+      background: rgba(31, 32, 29, 0.95);
+      backdrop-filter: blur(10px);
+      color: #ffffff;
+      border-radius: 16px;
+      padding: 0.75rem 1.15rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+      margin-top: 0.5rem;
+    }}
+    .studio-toast {{
+      position: fixed;
+      bottom: 78px;
+      right: 24px;
+      z-index: 99;
+      background: #0f3d38;
+      color: #ffffff;
+      padding: 0.65rem 1.1rem;
+      border-radius: 999px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 0.18s ease, transform 0.18s ease;
+    }}
+    .studio-toast.show {{
+      opacity: 1;
+      transform: translateY(0);
+    }}
+    .redline-card.highlight-pulse {{
+      outline: 2.5px solid var(--accent);
+      box-shadow: 0 0 0 5px rgba(27, 110, 102, 0.15);
+      transition: box-shadow 0.25s ease, outline 0.25s ease;
+    }}
 
     button, .btn {{
       background: var(--accent);
@@ -405,26 +480,11 @@ def render_studio_html() -> str:
     </div>
 
     <div class="workspace-stack">
-      <!-- TAB 1: COMPACT AGREEMENT BAR -->
+      <!-- TAB 1: 3-STEP PROGRESSIVE CONTRACT REVIEW BAR -->
       <div id="panelAudit" class="panel">
-        <div class="sample-list">
-          <button class="sample-btn active-sample" id="sampleBtn_predatory_msa" onclick="loadSampleContract('predatory_msa')">
-            <span class="s-title">Enterprise Master Services Agreement</span>
-            <span class="s-sub">Vendor software draft with 5 high-risk clauses</span>
-          </button>
-          <button class="sample-btn" id="sampleBtn_unbalanced_nda" onclick="loadSampleContract('unbalanced_nda')">
-            <span class="s-title">Mutual Non-Disclosure Agreement</span>
-            <span class="s-sub">Confidentiality draft with IP &amp; hiring restrictions</span>
-          </button>
-          <button class="sample-btn" id="sampleBtn_gdpr_dpa" onclick="loadSampleContract('gdpr_dpa')">
-            <span class="s-title">Customer Data Processing Addendum</span>
-            <span class="s-sub">Privacy addendum missing subprocessor notice</span>
-          </button>
-        </div>
-
-        <div class="controls-row">
+        <div style="display:grid;grid-template-columns:1.25fr auto;gap:14px;align-items:end;margin-bottom:0.95rem;">
           <div>
-            <label for="playbookSelect">Negotiation Standard (Playbook)</label>
+            <label for="playbookSelect" style="margin-top:0;"><span class="step-badge">Step 1</span>Pick Your Playbook (Negotiation Standard)</label>
             <select id="playbookSelect" onchange="runAuditTool()">
               <option value="founder_friendly">Balanced Buyer &amp; Founder Standard (12m Cap, 30d Notice, Keep IP)</option>
               <option value="saas_vendor">Software Provider Standard (Subscription Cap, Platform IP)</option>
@@ -432,27 +492,63 @@ def render_studio_html() -> str:
               <option value="hipaa_baa">Healthcare Privacy (BAA) Standard (Subcontractor Flow-Down)</option>
             </select>
           </div>
-          <div>
-            <label for="contractNameInput">Exported Word Filename</label>
-            <input id="contractNameInput" value="Enterprise_Master_Services_Agreement.docx" />
-          </div>
-          <div>
-            <label for="reviewerNameInput">Reviewer Name in Word</label>
-            <input id="reviewerNameInput" value="ClauseGuard Legal Desk" />
-          </div>
-          <div style="display:flex;gap:0.5rem;">
+          <div style="display:flex;gap:0.55rem;flex-wrap:wrap;">
             <label for="docxFileInput" class="btn secondary" style="margin:0;cursor:pointer;">
               Upload .docx or .txt
               <input id="docxFileInput" type="file" accept=".docx,.txt" style="display:none;" onchange="handleFileUpload(this)" />
             </label>
-            <button onclick="runAuditTool()">Review Agreement</button>
+            <button onclick="runAuditTool()" style="font-weight:600;padding:0.58rem 1.2rem;">
+              <span class="step-badge" style="background:#ffffff;color:var(--accent);margin-right:0.35rem;">Step 3</span>Check Contract &amp; Build Redlines
+            </button>
           </div>
         </div>
-        <span id="auditStatus" style="font-size:0.86rem;color:var(--muted);"></span>
 
-        <details style="margin-top:0.75rem;">
-          <summary style="cursor:pointer;font-size:0.88rem;font-weight:500;color:var(--accent);">View or Edit Full Agreement Text</summary>
-          <textarea id="contractTextArea" style="margin-top:0.5rem;"></textarea>
+        <div style="margin-bottom:0.45rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;">
+          <span style="font-size:0.86rem;font-weight:600;color:var(--text);"><span class="step-badge">Step 2</span>Choose a Sample Contract or Paste / Drop Yours</span>
+          <span id="auditStatus" style="font-size:0.86rem;color:var(--accent);font-weight:600;"></span>
+        </div>
+
+        <div class="sample-list">
+          <button class="sample-btn active-sample" id="sampleBtn_predatory_msa" onclick="loadSampleContract('predatory_msa')">
+            <span class="s-badge">Loaded ✓</span>
+            <span class="s-title">Enterprise Master Services Agreement</span>
+            <span class="s-sub">Vendor software draft with 5 high-risk clauses</span>
+          </button>
+          <button class="sample-btn" id="sampleBtn_unbalanced_nda" onclick="loadSampleContract('unbalanced_nda')">
+            <span class="s-badge">Loaded ✓</span>
+            <span class="s-title">Mutual Non-Disclosure Agreement</span>
+            <span class="s-sub">Confidentiality draft with IP &amp; hiring restrictions</span>
+          </button>
+          <button class="sample-btn" id="sampleBtn_gdpr_dpa" onclick="loadSampleContract('gdpr_dpa')">
+            <span class="s-badge">Loaded ✓</span>
+            <span class="s-title">Customer Data Processing Addendum</span>
+            <span class="s-sub">Privacy addendum missing subprocessor notice</span>
+          </button>
+        </div>
+
+        <div style="background:var(--raised);border-radius:12px;padding:0.75rem 0.9rem;border:1px solid var(--control);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.45rem;flex-wrap:wrap;gap:0.5rem;">
+            <span style="font-size:0.84rem;font-weight:600;color:var(--muted);">Agreement Text (Paste or edit directly below)</span>
+            <div style="display:flex;align-items:center;gap:0.55rem;">
+              <span id="inputStatsBadge" style="font-size:0.78rem;font-weight:600;background:var(--surface);color:var(--accent);padding:0.2rem 0.65rem;border-radius:999px;">0 words · 0 clauses</span>
+              <button type="button" id="clearContractBtn" class="secondary" style="padding:0.22rem 0.65rem;font-size:0.78rem;background:var(--surface);" onclick="clearContractInput()">Clear Text</button>
+            </div>
+          </div>
+          <textarea id="contractTextArea" oninput="updateInputStats()" placeholder="Paste your commercial agreement, NDA, MSA, or DPA text here..." style="min-height:110px;border:none;padding:0.25rem 0;outline:none;"></textarea>
+        </div>
+
+        <details style="margin-top:0.65rem;">
+          <summary style="cursor:pointer;font-size:0.84rem;font-weight:500;color:var(--muted);">Optional Word Export Settings (Filename &amp; Reviewer Name)</summary>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:0.5rem;">
+            <div>
+              <label for="contractNameInput">Exported Word Filename</label>
+              <input id="contractNameInput" value="Enterprise_Master_Services_Agreement.docx" />
+            </div>
+            <div>
+              <label for="reviewerNameInput">Reviewer Name in Word Track Changes</label>
+              <input id="reviewerNameInput" value="ClauseGuard Legal Desk" />
+            </div>
+          </div>
         </details>
       </div>
 
@@ -504,6 +600,22 @@ def render_studio_html() -> str:
         </div>
       </div>
 
+      <!-- STICKY EXPORT ACTION BAR -->
+      <div id="stickyExportBar" class="sticky-export-bar" style="display:none;">
+        <div style="font-size:0.88rem;">
+          <strong id="stickyBarTitle">Ready to Export Redlines</strong>
+          <span id="stickyBarSub" style="color:#d4d4d0;margin-left:0.5rem;">Native Microsoft Word (.docx) Track Changes + Counterparty Email</span>
+        </div>
+        <div style="display:flex;gap:0.55rem;flex-wrap:wrap;">
+          <button type="button" class="secondary" onclick="copyCounterpartyEmail()" style="background:rgba(255,255,255,0.14);color:#ffffff;">
+            Copy Negotiation Email
+          </button>
+          <button type="button" class="success-btn" onclick="downloadCustomizedDocx()">
+            Download Word (.docx) with Track Changes
+          </button>
+        </div>
+      </div>
+
       <!-- MEMBERSHIP PLAN DRAWER -->
       <details class="assistant-drawer">
         <summary>Membership Plan &amp; Review Quota (Complimentary vs. Professional $49.99)</summary>
@@ -525,6 +637,7 @@ def render_studio_html() -> str:
     </div>
   </main>
 
+  <div id="studioToast" class="studio-toast" role="status" aria-live="polite"></div>
   <script>{STUDIO_CLIENT_JS}</script>
 </body>
 </html>"""

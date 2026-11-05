@@ -340,6 +340,17 @@ def test_web_studio_and_submission_manifests() -> None:
     # Verify Greeting, Privacy, Terms, Zero Vendor Jargon, Custom .docx, and Upload Extract
     assert "Which agreement are we reviewing today?" in html
     assert "Welcome to your Contract Review Desk" in html
+    for ui_feature in (
+        "Pick Your Playbook",
+        "Check Contract &amp; Build Redlines",
+        "inputStatsBadge",
+        "clearContractBtn",
+        "acceptAllSafeFixes",
+        "jumpToNextRisk",
+        "stickyExportBar",
+        "studioToast",
+    ):
+        assert ui_feature in html
     for forbidden_vendor in ("Drata", "Deloitte", "AWS KMS"):
         assert forbidden_vendor not in html
 

@@ -3,29 +3,40 @@
 from __future__ import annotations
 
 
-def render_privacy_html() -> str:
-    """Return the plain-English Privacy & Confidentiality Policy page required for store submission."""
-    return """<!DOCTYPE html>
+def _static_page_shell(title: str, body_html: str) -> str:
+    return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/png" href="/icon.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Privacy &amp; Confidentiality Policy — ClauseGuard</title>
+  <title>{title}</title>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif:wght@400&display=swap" rel="stylesheet">
   <style>
-    body { font-family:'Instrument Sans',system-ui,sans-serif; background:#f9f9f9; color:#1f201d; margin:0; padding:3rem 1.5rem; line-height:1.65; font-size:16px; }
-    main { max-width:760px; margin:0 auto; background:#ffffff; border-radius:22px; padding:2.5rem; }
-    h1 { font-family:'Instrument Serif',Georgia,serif; font-size:2.4rem; font-weight:400; margin:0 0 0.5rem; }
-    h2 { font-size:1.1rem; margin:1.75rem 0 0.5rem; color:#1b6e66; }
-    p, li { font-size:1rem; color:#1f201d; max-width:65ch; }
-    a { color:#1b6e66; text-decoration:none; font-weight:500; }
+    body {{ font-family:'Instrument Sans',system-ui,sans-serif; background:#f9f9f9; color:#1f201d; margin:0; padding:3rem 1.5rem; line-height:1.65; font-size:16px; }}
+    main {{ max-width:820px; margin:0 auto; background:#ffffff; border-radius:22px; padding:2.5rem; }}
+    h1 {{ font-family:'Instrument Serif',Georgia,serif; font-size:2.4rem; font-weight:400; margin:0 0 0.5rem; }}
+    h2 {{ font-size:1.15rem; margin:1.85rem 0 0.5rem; color:#1b6e66; }}
+    p, li {{ font-size:1rem; color:#1f201d; max-width:68ch; }}
+    code {{ background:#f3f3f2; padding:0.15rem 0.4rem; border-radius:6px; font-size:0.9rem; }}
+    table {{ width:100%; border-collapse:collapse; margin:1rem 0; font-size:0.94rem; }}
+    th, td {{ text-align:left; padding:0.65rem 0.75rem; border-bottom:1px solid #e7e7e5; vertical-align:top; }}
+    th {{ font-weight:600; color:#1b6e66; background:#f9f9f9; }}
+    a {{ color:#1b6e66; text-decoration:none; font-weight:500; }}
   </style>
 </head>
 <body>
-  <main>
-    <p><a href="/">Return to ClauseGuard Review Desk</a></p>
+  <main>{body_html}</main>
+</body>
+</html>"""
+
+
+def render_privacy_html() -> str:
+    """Return the plain-English Privacy & Confidentiality Policy page required for store submission."""
+    return _static_page_shell(
+        "Privacy &amp; Confidentiality Policy — ClauseGuard",
+        """<p><a href="/">Return to ClauseGuard Review Desk</a></p>
     <h1>Privacy &amp; Confidentiality Policy</h1>
     <p><strong>Effective Date:</strong> November 2, 2026. Your agreements belong strictly to you. We never train AI models on your contracts, and we never sell or share your documents.</p>
     <h2>1. Zero Training on Your Agreements</h2>
@@ -35,85 +46,42 @@ def render_privacy_html() -> str:
     <h2>3. Security &amp; Encryption</h2>
     <p>All connections use TLS 1.3 encryption in transit, and authentication via Claude and ChatGPT uses OAuth 2.1 with S256 PKCE verification.</p>
     <h2>4. Contact</h2>
-    <p>Questions regarding privacy, security, or IT administrator reviews may be directed to <strong>mulak1@gmail.com</strong>.</p>
-  </main>
-</body>
-</html>"""
+    <p>Questions regarding privacy, security, or IT administrator reviews may be directed to <strong>mulak1@gmail.com</strong>.</p>""",
+    )
 
 
 def render_docs_html() -> str:
     """Return the Public User & IT Administrator Documentation page for Claude/ChatGPT MCP review."""
-    return """<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link rel="icon" type="image/png" href="/icon.png" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>User &amp; IT Admin Documentation — ClauseGuard: Contract Redlines</title>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif:wght@400&display=swap" rel="stylesheet">
-  <style>
-    body { font-family:'Instrument Sans',system-ui,sans-serif; background:#f9f9f9; color:#1f201d; margin:0; padding:3rem 1.5rem; line-height:1.65; font-size:16px; }
-    main { max-width:820px; margin:0 auto; background:#ffffff; border-radius:22px; padding:2.75rem; }
-    h1 { font-family:'Instrument Serif',Georgia,serif; font-size:2.4rem; font-weight:400; margin:0 0 0.5rem; }
-    h2 { font-size:1.15rem; margin:2rem 0 0.55rem; color:#1b6e66; }
-    p, li { font-size:1rem; color:#1f201d; max-width:68ch; }
-    code { background:#f3f3f2; padding:0.15rem 0.4rem; border-radius:6px; font-size:0.9rem; }
-    table { width:100%; border-collapse:collapse; margin:1rem 0; font-size:0.94rem; }
-    th, td { text-align:left; padding:0.65rem 0.75rem; border-bottom:1px solid #e7e7e5; vertical-align:top; }
-    th { font-weight:600; color:#1b6e66; background:#f9f9f9; }
-    a { color:#1b6e66; text-decoration:none; font-weight:500; }
-  </style>
-</head>
-<body>
-  <main>
-    <p><a href="/">← Return to ClauseGuard Review Desk</a></p>
+    return _static_page_shell(
+        "User &amp; IT Admin Documentation — ClauseGuard: Contract Redlines",
+        """<p><a href="/">← Return to ClauseGuard Review Desk</a></p>
     <h1>User &amp; IT Administrator Documentation</h1>
     <p><strong>Connector Name:</strong> ClauseGuard: Contract Redlines<br/>
     <strong>Remote MCP Endpoint:</strong> <code>https://clauseguard-mcp-production.up.railway.app/mcp</code><br/>
     <strong>Support Contact:</strong> <a href="mailto:mulak1@gmail.com">mulak1@gmail.com</a></p>
-
     <h2>1. Overview for End Users &amp; Legal Teams</h2>
     <p>ClauseGuard connects directly to Claude and ChatGPT to review commercial agreements (MSAs, Mutual NDAs, SaaS Subscriptions, Data Processing Agreements, and HIPAA BAAs) against plain-English negotiation playbooks. It returns clause-by-clause risk ratings, balanced replacement wording, a ready-to-send negotiation email, and a downloadable Microsoft Word (<code>.docx</code>) file with native Track Changes.</p>
-
     <h2>2. Security &amp; IT Administrator Review Summary</h2>
     <ul>
       <li><strong>100% Read-Only &amp; Idempotent Tools:</strong> All three exposed MCP tools (<code>audit_and_redline_contract</code>, <code>autofill_security_questionnaire</code>, and <code>compare_contract_versions</code>) are strictly stateless, read-only (<code>readOnlyHint: true</code>), and non-destructive (<code>destructiveHint: false</code>). The connector cannot mutate, delete, or modify any external systems or user records.</li>
       <li><strong>Zero Model Training &amp; Ephemeral Memory:</strong> Submitted contract text and generated <code>.docx</code> Track Changes artifacts are processed in ephemeral memory solely to fulfill the immediate request. No customer contracts or questionnaires are stored in persistent databases or used to train AI models.</li>
       <li><strong>Transport &amp; Authentication Security:</strong> All traffic is encrypted over HTTPS (TLS 1.3). The server supports open read-only evaluation as well as OAuth 2.1 with S256 PKCE discovery at <code>/.well-known/oauth-authorization-server</code>.</li>
     </ul>
-
     <h2>3. Included MCP Tools &amp; Scope</h2>
     <table>
-      <thead>
-        <tr><th>Tool Name</th><th>Permission Scope</th><th>Description</th></tr>
-      </thead>
+      <thead><tr><th>Tool Name</th><th>Permission Scope</th><th>Description</th></tr></thead>
       <tbody>
-        <tr>
-          <td><code>audit_and_redline_contract</code></td>
-          <td>Read-Only · Idempotent</td>
-          <td>Reviews commercial contracts against a playbook (<code>founder_friendly</code>, <code>saas_vendor</code>, <code>gdpr_dpa</code>, or <code>hipaa_baa</code>), scores risk (0–100), drafts a negotiation email, and returns a downloadable Microsoft Word (<code>.docx</code>) file with Track Changes.</td>
-        </tr>
-        <tr>
-          <td><code>autofill_security_questionnaire</code></td>
-          <td>Read-Only · Idempotent</td>
-          <td>Drafts plain-English compliance responses and evidence citations across SOC 2 Type II, GDPR, HIPAA, ISO 27001, encryption, incident response, and access control.</td>
-        </tr>
-        <tr>
-          <td><code>compare_contract_versions</code></td>
-          <td>Read-Only · Idempotent</td>
-          <td>Compares two contract drafts clause-by-clause and highlights material shifts in liability caps, payment windows, governing law, auto-renewal, and indemnity.</td>
-        </tr>
+        <tr><td><code>audit_and_redline_contract</code></td><td>Read-Only · Idempotent</td><td>Reviews commercial contracts against a playbook (<code>founder_friendly</code>, <code>saas_vendor</code>, <code>gdpr_dpa</code>, or <code>hipaa_baa</code>), scores risk (0–100), drafts a negotiation email, and returns a downloadable Microsoft Word (<code>.docx</code>) file with Track Changes.</td></tr>
+        <tr><td><code>autofill_security_questionnaire</code></td><td>Read-Only · Idempotent</td><td>Drafts plain-English compliance responses and evidence citations across SOC 2 Type II, GDPR, HIPAA, ISO 27001, encryption, incident response, and access control.</td></tr>
+        <tr><td><code>compare_contract_versions</code></td><td>Read-Only · Idempotent</td><td>Compares two contract drafts clause-by-clause and highlights material shifts in liability caps, payment windows, governing law, auto-renewal, and indemnity.</td></tr>
       </tbody>
     </table>
-
     <h2>4. Example Prompts in Claude</h2>
     <ul>
       <li><em>"Use ClauseGuard to review this vendor MSA using the founder_friendly playbook and give me the download link for the redlined Word (.docx) file."</em></li>
       <li><em>"Compare our original draft against the vendor's returned markup using ClauseGuard and flag any changes to liability or payment terms."</em></li>
       <li><em>"Use ClauseGuard to complete these 5 customer security questionnaire items."</em></li>
     </ul>
-
     <h2>5. Policies &amp; Support</h2>
     <ul>
       <li><strong>About ClauseGuard:</strong> <a href="/about">https://clauseguard-mcp-production.up.railway.app/about</a></li>
@@ -121,48 +89,25 @@ def render_docs_html() -> str:
       <li><strong>Terms of Service:</strong> <a href="/terms">https://clauseguard-mcp-production.up.railway.app/terms</a></li>
       <li><strong>GitHub Repository:</strong> <a href="https://github.com/mulak1/clauseguard-mcp">https://github.com/mulak1/clauseguard-mcp</a></li>
       <li><strong>Support Email:</strong> <a href="mailto:mulak1@gmail.com">mulak1@gmail.com</a></li>
-    </ul>
-  </main>
-</body>
-</html>"""
+    </ul>""",
+    )
 
 
 def render_about_html() -> str:
     """Return the About & Company Information page for ClauseGuard."""
-    return """<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link rel="icon" type="image/png" href="/icon.png" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>About ClauseGuard — Commercial Contract Review &amp; Word Redlines</title>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif:wght@400&display=swap" rel="stylesheet">
-  <style>
-    body { font-family:'Instrument Sans',system-ui,sans-serif; background:#f9f9f9; color:#1f201d; margin:0; padding:3rem 1.5rem; line-height:1.65; font-size:16px; }
-    main { max-width:780px; margin:0 auto; background:#ffffff; border-radius:22px; padding:2.75rem; }
-    h1 { font-family:'Instrument Serif',Georgia,serif; font-size:2.4rem; font-weight:400; margin:0 0 0.5rem; }
-    h2 { font-size:1.15rem; margin:1.85rem 0 0.5rem; color:#1b6e66; }
-    p, li { font-size:1rem; color:#1f201d; max-width:66ch; }
-    a { color:#1b6e66; text-decoration:none; font-weight:500; }
-  </style>
-</head>
-<body>
-  <main>
-    <p><a href="/">← Return to ClauseGuard Review Desk</a></p>
+    return _static_page_shell(
+        "About ClauseGuard — Commercial Contract Review &amp; Word Redlines",
+        """<p><a href="/">← Return to ClauseGuard Review Desk</a></p>
     <h1>About ClauseGuard</h1>
     <p><strong>ClauseGuard</strong> builds plain-English commercial contract review, redlining, and security questionnaire tools designed to work both as a standalone legal review desk and natively inside AI assistants via the Model Context Protocol (MCP).</p>
-
     <h2>Our Mission</h2>
     <p>Founders, legal counsel, procurement leads, and revenue teams spend hours manually marking up standard commercial agreements—Master Services Agreements (MSAs), Mutual NDAs, Data Processing Agreements (DPAs), and HIPAA Business Associate Agreements (BAAs). ClauseGuard gives every team instant, playbook-guided risk scoring, balanced fallback wording, negotiation emails, and native Microsoft Word (<code>.docx</code>) Track Changes without requiring an enterprise CLM contract.</p>
-
     <h2>Privacy &amp; Security by Design</h2>
     <ul>
       <li><strong>Zero Model Training:</strong> We never train AI models on customer agreements or security questionnaires.</li>
       <li><strong>Read-Only &amp; Ephemeral Architecture:</strong> All MCP tools are stateless and read-only, and generated Word Track Changes documents are held only in ephemeral memory for download.</li>
       <li><strong>Open Standards:</strong> Built on the Model Context Protocol (MCP) and OpenXML WordprocessingML standards so your redlines open cleanly in Microsoft Word, Google Docs, and Apple Pages.</li>
     </ul>
-
     <h2>Company &amp; Leadership</h2>
     <ul>
       <li><strong>Organization:</strong> ClauseGuard</li>
@@ -171,35 +116,15 @@ def render_about_html() -> str:
       <li><strong>Documentation:</strong> <a href="/docs">https://clauseguard-mcp-production.up.railway.app/docs</a></li>
       <li><strong>GitHub:</strong> <a href="https://github.com/mulak1/clauseguard-mcp">https://github.com/mulak1/clauseguard-mcp</a></li>
       <li><strong>Contact &amp; Support:</strong> <a href="mailto:mulak1@gmail.com">mulak1@gmail.com</a></li>
-    </ul>
-  </main>
-</body>
-</html>"""
+    </ul>""",
+    )
 
 
 def render_terms_html() -> str:
     """Return the plain-English Terms of Service & Legal Disclaimer page."""
-    return """<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link rel="icon" type="image/png" href="/icon.png" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Terms of Service &amp; Disclaimer — ClauseGuard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif:wght@400&display=swap" rel="stylesheet">
-  <style>
-    body { font-family:'Instrument Sans',system-ui,sans-serif; background:#f9f9f9; color:#1f201d; margin:0; padding:3rem 1.5rem; line-height:1.65; font-size:16px; }
-    main { max-width:760px; margin:0 auto; background:#ffffff; border-radius:22px; padding:2.5rem; }
-    h1 { font-family:'Instrument Serif',Georgia,serif; font-size:2.4rem; font-weight:400; margin:0 0 0.5rem; }
-    h2 { font-size:1.1rem; margin:1.75rem 0 0.5rem; color:#1b6e66; }
-    p { font-size:1rem; color:#1f201d; max-width:65ch; }
-    a { color:#1b6e66; text-decoration:none; font-weight:500; }
-  </style>
-</head>
-<body>
-  <main>
-    <p><a href="/">Return to ClauseGuard Review Desk</a></p>
+    return _static_page_shell(
+        "Terms of Service &amp; Disclaimer — ClauseGuard",
+        """<p><a href="/">Return to ClauseGuard Review Desk</a></p>
     <h1>Terms of Service &amp; Review Disclaimer</h1>
     <p><strong>Effective Date:</strong> November 2, 2026</p>
     <h2>1. Decision Support — You Remain in Control</h2>
@@ -207,10 +132,8 @@ def render_terms_html() -> str:
     <h2>2. Reviewer Sovereignty</h2>
     <p>Every suggested revision is presented as a transparent Track Change so you or your legal counsel can accept, modify, or reject each edit before sending an agreement to a counterparty.</p>
     <h2>3. Service Plans</h2>
-    <p>The Complimentary Plan includes 1 agreement review and Word Track Changes export per month. The Professional Plan ($49/month) provides unlimited agreement reviews, custom redline exports, draft comparisons, and security questionnaire automation.</p>
-  </main>
-</body>
-</html>"""
+    <p>The Complimentary Plan includes 1 agreement review and Word Track Changes export per month. The Professional Plan ($49/month) provides unlimited agreement reviews, custom redline exports, draft comparisons, and security questionnaire automation.</p>""",
+    )
 
 
 STUDIO_CLIENT_JS = """
@@ -272,9 +195,12 @@ function switchTab(tab) {
     document.getElementById('panel' + cap).style.display = (t === tab) ? 'block' : 'none';
     document.getElementById('tabBtn' + cap).classList.toggle('active', t === tab);
   });
+  const stickyBar = document.getElementById('stickyExportBar');
+  if (stickyBar) stickyBar.style.display = (tab === 'audit' && CURRENT_AUDIT) ? 'flex' : 'none';
   const greetSub = document.getElementById('contextualStepGreeting');
   if (tab === 'audit') {
-    greetSub.textContent = 'Welcome to your Contract Review Desk. Select a sample agreement, upload a Word (.docx) file, or paste your draft on the left, then customize and export your tracked redlines on the right.';
+    greetSub.textContent = 'Welcome to your Contract Review Desk. Follow the 3 steps below: pick your playbook, choose a sample or paste your contract, and build your tracked redlines.';
+    if (CURRENT_AUDIT) renderAuditWorkspace();
   } else if (tab === 'quest') {
     greetSub.textContent = 'Welcome to the Security & Privacy Questionnaire Desk. Customize your organization profile and generate clear, audit-ready answers in one click.';
     runQuestionnaireTool();
@@ -344,6 +270,7 @@ async function handleFileUpload(inputEl) {
     const d = await r.json();
     if (r.ok && d.text) {
       document.getElementById('contractTextArea').value = d.text;
+      updateInputStats();
       statusEl.textContent = `Loaded ${file.name}. Running review...`;
       await runAuditTool();
     } else {
@@ -352,8 +279,42 @@ async function handleFileUpload(inputEl) {
   } else {
     const text = await file.text();
     document.getElementById('contractTextArea').value = text;
+    updateInputStats();
     await runAuditTool();
   }
+}
+
+let NEXT_RISK_CURSOR = 0;
+
+function showToast(msg) {
+  const el = document.getElementById('studioToast');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(window.__cgToastTimer);
+  window.__cgToastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+function updateInputStats() {
+  const ta = document.getElementById('contractTextArea');
+  const badge = document.getElementById('inputStatsBadge');
+  const clearBtn = document.getElementById('clearContractBtn');
+  if (!ta || !badge) return;
+  const raw = ta.value.trim();
+  const words = raw ? raw.split(/\\s+/).length : 0;
+  const clauses = raw ? Math.max(1, raw.split(/\\n\\s*\\n|(?:^|\\n)\\s*(?:\\d+\\.|Section\\s+\\d+)/i).filter(Boolean).length) : 0;
+  badge.textContent = `${words} word${words === 1 ? '' : 's'} · ~${clauses} clause${clauses === 1 ? '' : 's'}`;
+  if (clearBtn) clearBtn.style.display = words > 0 ? 'inline-flex' : 'none';
+}
+
+function clearContractInput() {
+  const ta = document.getElementById('contractTextArea');
+  if (!ta) return;
+  ta.value = '';
+  document.querySelectorAll('.sample-btn').forEach(b => b.classList.remove('active-sample'));
+  updateInputStats();
+  ta.focus();
+  showToast('✓ Cleared contract text — paste or drop your agreement');
 }
 
 async function loadSampleContract(key) {
@@ -366,6 +327,7 @@ async function loadSampleContract(key) {
   document.querySelectorAll('.sample-btn').forEach(b => b.classList.remove('active-sample'));
   const activeBtn = document.getElementById('sampleBtn_' + key);
   if (activeBtn) activeBtn.classList.add('active-sample');
+  updateInputStats();
   await runAuditTool();
 }
 
@@ -412,7 +374,31 @@ async function runAuditTool() {
   CURRENT_AUDIT.findings.forEach(f => {
     CLAUSE_DECISIONS[f.clause_id] = { mode: 'standard', customText: f.proposed_redline };
   });
+  NEXT_RISK_CURSOR = 0;
   renderAuditWorkspace(data.quota);
+}
+
+function acceptAllSafeFixes() {
+  if (!CURRENT_AUDIT) return;
+  CURRENT_AUDIT.findings.forEach(f => {
+    CLAUSE_DECISIONS[f.clause_id] = { mode: 'standard', customText: f.proposed_redline };
+  });
+  ACTIVE_FILTER = 'all';
+  renderAuditWorkspace();
+  showToast(`✓ Applied all ${CURRENT_AUDIT.findings.length} recommended safe fixes`);
+}
+
+function jumpToNextRisk() {
+  const cards = Array.from(document.querySelectorAll('#visualOutput .redline-card[data-risky="1"]'));
+  if (!cards.length) {
+    showToast('✓ No remaining risky clauses in current view');
+    return;
+  }
+  const target = cards[NEXT_RISK_CURSOR % cards.length];
+  NEXT_RISK_CURSOR = (NEXT_RISK_CURSOR + 1) % cards.length;
+  document.querySelectorAll('#visualOutput .redline-card').forEach(c => c.classList.remove('highlight-pulse'));
+  target.classList.add('highlight-pulse');
+  target.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 function setClauseDecision(clauseId, mode) {
@@ -432,6 +418,7 @@ function updateCustomClauseText(clauseId, val) {
 
 function setFilter(filterVal) {
   ACTIVE_FILTER = filterVal;
+  NEXT_RISK_CURSOR = 0;
   renderAuditWorkspace();
 }
 
@@ -440,7 +427,8 @@ function copyCounterpartyEmail() {
   if (!el) return;
   navigator.clipboard.writeText(el.value);
   const btn = document.getElementById('copyEmailBtn');
-  if (btn) { btn.textContent = 'Copied Email Note'; setTimeout(() => { btn.textContent = 'Copy Polite Email to Counterparty'; }, 2000); }
+  if (btn) { btn.textContent = '✓ Copied to Clipboard'; setTimeout(() => { btn.textContent = 'Copy Polite Email to Counterparty'; }, 2200); }
+  showToast('✓ Copied counterparty negotiation email to clipboard');
 }
 
 async function downloadCustomizedDocx() {
@@ -479,6 +467,7 @@ async function downloadCustomizedDocx() {
   });
   const d = await resp.json();
   if (resp.ok && d.download_url) {
+    showToast(`✓ Downloaded ${CURRENT_AUDIT.contract_name} with ${accepted.length} Track Changes`);
     window.location.href = d.download_url;
   }
 }
@@ -489,7 +478,9 @@ function renderAuditWorkspace() {
 
   let activeAcceptedCount = 0;
   let remainingRiskPoints = 0;
+  let highPriorityCount = 0;
   res.findings.forEach(f => {
+    if (f.severity === 'CRITICAL' || f.severity === 'HIGH') highPriorityCount += 1;
     const dec = CLAUSE_DECISIONS[f.clause_id] || { mode: 'standard' };
     if (dec.mode === 'dismissed') {
       remainingRiskPoints += f.risk_points;
@@ -507,9 +498,17 @@ function renderAuditWorkspace() {
   document.getElementById('kpiStandardVal').textContent = res.playbook_label;
   document.getElementById('kpiStandardCap').textContent = res.contract_name;
 
+  const stickyBar = document.getElementById('stickyExportBar');
+  if (stickyBar) {
+    stickyBar.style.display = 'flex';
+    const sbTitle = document.getElementById('stickyBarTitle');
+    if (sbTitle) sbTitle.textContent = `${activeAcceptedCount} of ${res.findings.length} Redlines Ready (${res.risk_score} → ${postRedlineScore}/100 Risk)`;
+  }
+
   const filteredFindings = res.findings.filter(f => {
+    const dec = CLAUSE_DECISIONS[f.clause_id] || { mode: 'standard' };
     if (ACTIVE_FILTER === 'critical') return f.severity === 'CRITICAL' || f.severity === 'HIGH';
-    if (ACTIVE_FILTER === 'moderate') return f.severity === 'MODERATE' || f.severity === 'LOW';
+    if (ACTIVE_FILTER === 'accepted') return dec.mode !== 'dismissed';
     return true;
   });
 
@@ -523,7 +522,7 @@ function renderAuditWorkspace() {
       : (f.severity === 'HIGH' ? 'High Priority Revision' : 'Commercial Negotiation Point');
 
     return `
-      <div class="redline-card" style="opacity:${dec.mode === 'dismissed' ? '0.65' : '1'};">
+      <div class="redline-card" data-risky="1" id="clauseCard_${f.clause_id}" style="opacity:${dec.mode === 'dismissed' ? '0.65' : '1'};">
         <div class="redline-header">
           <div>
             <div style="font-size:1.05rem;font-weight:600;color:var(--text);">${f.clause_id}: ${f.title}</div>
@@ -598,20 +597,31 @@ function renderAuditWorkspace() {
     </div>
   ` : '';
 
+  const bottomLineSummary = res.findings.length === 0
+    ? 'Bottom Line: No risky clauses flagged — this agreement aligns with your selected negotiation playbook.'
+    : `Bottom Line: ${highPriorityCount} high-risk clause${highPriorityCount === 1 ? '' : 's'} (${res.findings.length} total) need changes before you sign — reducing risk from ${res.risk_score}/100 down to ${postRedlineScore}/100.`;
+
   document.getElementById('visualOutput').innerHTML = `
-    <div class="greeting-callout">
-      <strong>Here is where this agreement stands:</strong> ${res.sign_off_recommendation}
-      <div style="font-size:0.9rem;color:var(--muted);margin-top:0.25rem;max-width:65ch;">${res.executive_summary}</div>
+    <div class="greeting-callout" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.85rem;">
+      <div style="max-width:64ch;">
+        <div style="font-size:1rem;font-weight:600;color:var(--text);margin-bottom:0.2rem;">${bottomLineSummary}</div>
+        <div style="font-size:0.88rem;color:var(--muted);">${res.sign_off_recommendation} — ${res.executive_summary}</div>
+      </div>
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+        <button type="button" onclick="acceptAllSafeFixes()" class="success-btn">✓ Accept All Safe Fixes (${res.findings.length})</button>
+        <button type="button" onclick="jumpToNextRisk()" class="secondary">Jump to Next Risk ↓</button>
+      </div>
     </div>
 
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.75rem;margin:0.85rem 0;">
       <div style="font-size:0.94rem;color:var(--text);">
-        <strong>You are in the driver's seat:</strong> Review, customize, or dismiss any suggestion below.
+        <strong>Filter &amp; Step Through Clauses:</strong> Click any pill to filter or jump straight to the next issue.
       </div>
-      <div style="display:flex;gap:0.4rem;">
-        <button class="chip-btn ${ACTIVE_FILTER === 'all' ? 'active-chip' : ''}" onclick="setFilter('all')">All (${res.findings.length})</button>
-        <button class="chip-btn ${ACTIVE_FILTER === 'critical' ? 'active-chip' : ''}" onclick="setFilter('critical')">Must Change First</button>
-        <button class="chip-btn ${ACTIVE_FILTER === 'moderate' ? 'active-chip' : ''}" onclick="setFilter('moderate')">Negotiable</button>
+      <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
+        <button class="chip-btn ${ACTIVE_FILTER === 'all' ? 'active-chip' : ''}" onclick="setFilter('all')">All Clauses (${res.findings.length})</button>
+        <button class="chip-btn ${ACTIVE_FILTER === 'critical' ? 'active-chip' : ''}" onclick="setFilter('critical')">Needs Changes Only (${highPriorityCount})</button>
+        <button class="chip-btn ${ACTIVE_FILTER === 'accepted' ? 'active-chip' : ''}" onclick="setFilter('accepted')">Accepted (${activeAcceptedCount})</button>
+        <button class="chip-btn" style="background:#e8f3f1;color:var(--accent);font-weight:600;" onclick="jumpToNextRisk()">Jump to Next Risk ↓</button>
       </div>
     </div>
 
