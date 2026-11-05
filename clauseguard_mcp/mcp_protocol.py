@@ -7,6 +7,7 @@ from typing import Any
 from pydantic import ValidationError
 
 from clauseguard_mcp.audit_engine import audit_and_redline_contract
+from clauseguard_mcp.docx_engine import sanitize_docx_filename
 from clauseguard_mcp.models import (
     AuditContractRequest,
     CompareVersionsRequest,
@@ -196,20 +197,27 @@ def _dispatch_tool_call(rpc_id: Any, params: dict[str, Any]) -> dict[str, Any]:
 
     try:
         if tool_name == "audit_and_redline_contract":
-            req = AuditContractRequest(**arguments)
+            req = AuditContractRequest(**arguments) if isinstance(arguments, dict) else AuditContractRequest(contract_text=str(arguments))
             res = audit_and_redline_contract(req)
             data = res.model_dump(mode="json")
+            safe_fn = sanitize_docx_filename(res.contract_name)
+            friendly_docx_url = f"https://clauseguard-mcp-production.up.railway.app/downloads/{safe_fn}"
             public_docx_url = f"https://clauseguard-mcp-production.up.railway.app{res.download_url}"
+            data["download_docx_url"] = friendly_docx_url
             data["public_download_url"] = public_docx_url
             text_summary = (
                 f"{res.sign_off_recommendation}\n"
                 f"{res.executive_summary}\n"
-                f"Download Word (.docx) with Track Changes: {public_docx_url}"
+                f"Download Word (.docx) with Track Changes: {friendly_docx_url}"
             )
             return _tool_success(rpc_id, text_summary, data)
 
         if tool_name == "autofill_security_questionnaire":
-            req_q = QuestionnaireRequest(**arguments)
+            req_q = (
+                QuestionnaireRequest(**arguments)
+                if isinstance(arguments, dict)
+                else QuestionnaireRequest.model_validate(arguments)
+            )
             res_q = autofill_security_questionnaire(req_q)
             data_q = res_q.model_dump(mode="json")
             text_q = (
@@ -219,7 +227,11 @@ def _dispatch_tool_call(rpc_id: Any, params: dict[str, Any]) -> dict[str, Any]:
             return _tool_success(rpc_id, text_q, data_q)
 
         if tool_name == "compare_contract_versions":
-            req_c = CompareVersionsRequest(**arguments)
+            req_c = (
+                CompareVersionsRequest(**arguments)
+                if isinstance(arguments, dict)
+                else CompareVersionsRequest.model_validate(arguments)
+            )
             res_c = compare_contract_versions(req_c)
             data_c = res_c.model_dump(mode="json")
             return _tool_success(rpc_id, res_c.summary, data_c)

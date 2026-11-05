@@ -405,6 +405,36 @@ def render_studio_html() -> str:
       max-height: 220px;
       margin-top: 0.75rem;
     }}
+    .market-norm-pill {{
+      font-size: 0.78rem;
+      padding: 0.2rem 0.65rem;
+      border-radius: 999px;
+      font-weight: 600;
+      background: #e8f3f1;
+      color: var(--accent);
+      white-space: nowrap;
+    }}
+    .legal-footer {{
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--muted);
+      padding: 1.1rem 0 0.5rem;
+      border-top: 1px solid var(--control);
+      margin-top: 0.75rem;
+    }}
+    @media print {{
+      .topbar, .tabs, #panelAudit, #panelQuest, #panelDiff, #stickyExportBar, .assistant-drawer, .decision-bar, .studio-toast, #copyEmailBtn {{
+        display: none !important;
+      }}
+      body, .panel, .redline-card, .kpi-tile {{
+        background: #ffffff !important;
+        box-shadow: none !important;
+      }}
+      .shell {{
+        max-width: 100% !important;
+        padding: 0 !important;
+      }}
+    }}
   </style>
 </head>
 <body>
@@ -497,8 +527,8 @@ def render_studio_html() -> str:
               Upload .docx or .txt
               <input id="docxFileInput" type="file" accept=".docx,.txt" style="display:none;" onchange="handleFileUpload(this)" />
             </label>
-            <button onclick="runAuditTool()" style="font-weight:600;padding:0.58rem 1.2rem;">
-              <span class="step-badge" style="background:#ffffff;color:var(--accent);margin-right:0.35rem;">Step 3</span>Check Contract &amp; Build Redlines
+            <button onclick="runAuditTool()" title="Shortcut: Cmd/Ctrl + Enter" style="font-weight:600;padding:0.58rem 1.2rem;">
+              <span class="step-badge" style="background:#ffffff;color:var(--accent);margin-right:0.35rem;">Step 3</span>Check Contract &amp; Build Redlines <span style="opacity:0.82;font-weight:500;font-size:0.8rem;margin-left:0.25rem;">(⌘↵)</span>
             </button>
           </div>
         </div>
@@ -534,7 +564,7 @@ def render_studio_html() -> str:
               <button type="button" id="clearContractBtn" class="secondary" style="padding:0.22rem 0.65rem;font-size:0.78rem;background:var(--surface);" onclick="clearContractInput()">Clear Text</button>
             </div>
           </div>
-          <textarea id="contractTextArea" oninput="updateInputStats()" placeholder="Paste your commercial agreement, NDA, MSA, or DPA text here..." style="min-height:110px;border:none;padding:0.25rem 0;outline:none;"></textarea>
+          <textarea id="contractTextArea" oninput="updateInputStats()" onkeydown="if((event.metaKey||event.ctrlKey)&amp;&amp;event.key==='Enter'){{event.preventDefault();runAuditTool();}}" placeholder="Paste your commercial agreement, NDA, MSA, or DPA text here... (Press ⌘+Enter to check)" style="min-height:110px;border:none;padding:0.25rem 0;outline:none;"></textarea>
         </div>
 
         <details style="margin-top:0.65rem;">
@@ -634,6 +664,10 @@ def render_studio_html() -> str:
           </div>
         </div>
       </details>
+
+      <footer class="legal-footer">
+        ClauseGuard provides automated commercial contract analysis and redline drafting, not formal legal representation or an attorney-client relationship.
+      </footer>
     </div>
   </main>
 

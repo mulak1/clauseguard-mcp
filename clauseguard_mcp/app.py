@@ -26,6 +26,7 @@ from clauseguard_mcp.audit_engine import (
 from clauseguard_mcp.docx_engine import (
     extract_text_from_b64_docx,
     get_docx_artifact,
+    get_docx_by_filename,
 )
 from clauseguard_mcp.mcp_protocol import (
     MCP_PROTOCOL_VERSION,
@@ -443,6 +444,20 @@ def create_app() -> FastAPI:
             content=docx_bytes,
             media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
             headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+        )
+
+    @app.get("/downloads/{filename}")
+    def download_docx_by_name(filename: str, request: Request) -> Response:
+        artifact = get_docx_by_filename(filename)
+        if artifact is None:
+            return JSONResponse(status_code=404, content={"error": "Document artifact not found"})
+        safe_name, docx_bytes = artifact
+        src = detect_source(request.headers.get("user-agent", ""), path="/downloads")
+        record_event(event_type="docx_download", source=src, tool_name="download_docx", detail=safe_name)
+        return Response(
+            content=docx_bytes,
+            media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            headers={"Content-Disposition": f'attachment; filename="{safe_name}"'},
         )
 
     @app.get("/manifests/claude")

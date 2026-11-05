@@ -5,6 +5,7 @@ from __future__ import annotations
 import base64
 from datetime import datetime, timezone
 import io
+import re
 import uuid
 from xml.sax.saxutils import escape
 import xml.etree.ElementTree as ET
@@ -15,21 +16,47 @@ from clauseguard_mcp.models import PlaybookType, RedlineFinding
 
 W_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 
-# In-memory store mapping doc_id -> (filename, docx_bytes)
+# In-memory store mapping doc_id -> (filename, docx_bytes) and sanitized filename -> (filename, docx_bytes)
 _DOCX_STORE: dict[str, tuple[str, bytes]] = {}
+_FILENAME_STORE: dict[str, tuple[str, bytes]] = {}
+
+
+def sanitize_docx_filename(filename: str) -> str:
+    """Return a URL-safe .docx filename."""
+    clean = re.sub(r"[^A-Za-z0-9._-]", "_", (filename or "Contract_Redlined.docx").strip())
+    if not clean.lower().endswith(".docx"):
+        clean = f"{clean}.docx"
+    return clean
 
 
 def store_docx_artifact(filename: str, docx_bytes: bytes) -> str:
     """Store generated .docx bytes and return an immutable doc_id."""
     doc_id = f"doc_{uuid.uuid4().hex[:12]}"
-    safe_name = filename if filename.endswith(".docx") else f"{filename}.docx"
+    safe_name = sanitize_docx_filename(filename)
     _DOCX_STORE[doc_id] = (safe_name, docx_bytes)
+    _FILENAME_STORE[safe_name] = (safe_name, docx_bytes)
+    _FILENAME_STORE[f"{doc_id}_{safe_name}"] = (safe_name, docx_bytes)
+    if len(_FILENAME_STORE) > 60:
+        oldest_key = next(iter(_FILENAME_STORE))
+        _FILENAME_STORE.pop(oldest_key, None)
     return doc_id
 
 
 def get_docx_artifact(doc_id: str) -> tuple[str, bytes] | None:
     """Retrieve stored (filename, docx_bytes) by doc_id."""
     return _DOCX_STORE.get(doc_id)
+
+
+def get_docx_by_filename(filename: str) -> tuple[str, bytes] | None:
+    """Retrieve stored (filename, docx_bytes) by filename or doc_id."""
+    if filename in _FILENAME_STORE:
+        return _FILENAME_STORE[filename]
+    safe = sanitize_docx_filename(filename)
+    if safe in _FILENAME_STORE:
+        return _FILENAME_STORE[safe]
+    if filename in _DOCX_STORE:
+        return _DOCX_STORE[filename]
+    return None
 
 
 def extract_text_from_docx_bytes(docx_bytes: bytes) -> str:

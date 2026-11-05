@@ -394,4 +394,115 @@ def test_web_studio_and_submission_manifests() -> None:
     assert extract_resp.status_code == 200
     assert "Mutual liability" in extract_resp.json()["text"]
 
+    # Verify P0 Zero-Bloat UI elements
+    for p0_feature in (
+        "Market Norm:",
+        "copySingleClause",
+        "@media print",
+        "not formal legal representation or an attorney-client relationship",
+        "⌘↵",
+    ):
+        assert p0_feature in html
+
+
+def test_p0_forgiving_cold_call_coercion_and_downloads_link() -> None:
+    client = TestClient(create_app())
+    # 1. Test autofill_security_questionnaire with question_id / question_text keys
+    cold_q1 = client.post(
+        "/mcp",
+        json={
+            "jsonrpc": "2.0",
+            "id": 901,
+            "method": "tools/call",
+            "params": {
+                "name": "autofill_security_questionnaire",
+                "arguments": {
+                    "items": [
+                        {
+                            "question_id": "Q1",
+                            "question_text": "Do you encrypt data at rest?",
+                        }
+                    ],
+                    "vendor_profile": {"company": "Acme Cloud"},
+                },
+            },
+        },
+    )
+    assert cold_q1.status_code == 200
+    q1_data = cold_q1.json()
+    assert "error" not in q1_data
+    assert q1_data["result"]["structuredContent"]["total_items"] == 1
+    assert q1_data["result"]["structuredContent"]["answers"][0]["id"] == "Q1"
+
+    # 2. Test autofill_security_questionnaire with plain strings in items
+    cold_q2 = client.post(
+        "/mcp",
+        json={
+            "jsonrpc": "2.0",
+            "id": 902,
+            "method": "tools/call",
+            "params": {
+                "name": "autofill_security_questionnaire",
+                "arguments": {
+                    "items": ["Do you encrypt data at rest?"],
+                },
+            },
+        },
+    )
+    assert cold_q2.status_code == 200
+    q2_data = cold_q2.json()
+    assert "error" not in q2_data
+    assert q2_data["result"]["structuredContent"]["total_items"] == 1
+    assert "AES-256" in q2_data["result"]["structuredContent"]["answers"][0]["answer"]
+
+    # 3. Test audit_and_redline_contract with 'text' alias & verify /downloads/{filename}.docx
+    cold_audit = client.post(
+        "/mcp",
+        json={
+            "jsonrpc": "2.0",
+            "id": 903,
+            "method": "tools/call",
+            "params": {
+                "name": "audit_and_redline_contract",
+                "arguments": {
+                    "filename": "Cold_Reviewer_MSA.docx",
+                    "text": "1. Customer liability shall be uncapped and unlimited for all claims.",
+                },
+            },
+        },
+    )
+    assert cold_audit.status_code == 200
+    audit_res = cold_audit.json()["result"]
+    dl_url = audit_res["structuredContent"]["download_docx_url"]
+    assert dl_url.startswith(
+        "https://clauseguard-mcp-production.up.railway.app/downloads/"
+    )
+    assert dl_url in audit_res["content"][0]["text"]
+
+    dl_path = "/downloads/" + dl_url.split("/downloads/", 1)[1]
+    dl_resp = client.get(dl_path)
+    assert dl_resp.status_code == 200
+    assert dl_resp.content[:2] == b"PK"
+    assert client.get("/downloads/nonexistent_file.docx").status_code == 404
+
+    # 4. Test compare_contract_versions with draft_a / draft_b aliases
+    cold_diff = client.post(
+        "/mcp",
+        json={
+            "jsonrpc": "2.0",
+            "id": 904,
+            "method": "tools/call",
+            "params": {
+                "name": "compare_contract_versions",
+                "arguments": {
+                    "draft_a": "1. Liability is capped at 12 months of fees.",
+                    "draft_b": "1. Customer liability shall be uncapped and unlimited.",
+                },
+            },
+        },
+    )
+    assert cold_diff.status_code == 200
+    assert "error" not in cold_diff.json()
+
+
 

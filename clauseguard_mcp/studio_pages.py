@@ -422,6 +422,29 @@ function setFilter(filterVal) {
   renderAuditWorkspace();
 }
 
+function getMarketNormLabel(f) {
+  const t = `${f.title || ''} ${f.category || ''} ${f.playbook_reference || ''}`.toLowerCase();
+  if (t.includes('liability')) return 'Market Norm: 12-Month Fee Cap';
+  if (t.includes('indemn')) return 'Market Norm: Mutual Third-Party IP Only';
+  if (t.includes('renew') || t.includes('terminat')) return 'Market Norm: Mutual 30-Day Notice';
+  if (t.includes('ip') || t.includes('intellectual') || t.includes('ownership') || t.includes('work')) return 'Market Norm: Customer Owns Custom IP';
+  if (t.includes('subprocessor') || t.includes('gdpr') || t.includes('data')) return 'Market Norm: 30-Day Prior Notice';
+  if (t.includes('solicit') || t.includes('compete')) return 'Market Norm: Narrow Direct-Hire Carveout';
+  return 'Market Norm: Balanced Mutual Protection';
+}
+
+function copySingleClause(clauseId) {
+  if (!CURRENT_AUDIT) return;
+  const f = (CURRENT_AUDIT.findings || []).find(item => item.clause_id === clauseId);
+  if (!f) return;
+  const dec = CLAUSE_DECISIONS[clauseId] || { mode: 'standard', customText: f.proposed_redline };
+  const textToCopy = dec.mode === 'compromise'
+    ? (f.compromise_redline || f.proposed_redline)
+    : (dec.mode === 'custom' ? dec.customText : f.proposed_redline);
+  navigator.clipboard.writeText(textToCopy);
+  showToast(`✓ Copied replacement clause (${clauseId}) to clipboard`);
+}
+
 function copyCounterpartyEmail() {
   const el = document.getElementById('counterpartyEmailBox');
   if (!el) return;
@@ -528,7 +551,10 @@ function renderAuditWorkspace() {
             <div style="font-size:1.05rem;font-weight:600;color:var(--text);">${f.clause_id}: ${f.title}</div>
             <div style="font-size:0.84rem;color:var(--muted);">${f.playbook_reference}</div>
           </div>
-          <span class="sev-pill sev-${f.severity}">${sevLabel}</span>
+          <div style="display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center;">
+            <span class="market-norm-pill">${getMarketNormLabel(f)}</span>
+            <span class="sev-pill sev-${f.severity}">${sevLabel}</span>
+          </div>
         </div>
 
         <p style="font-size:0.95rem;color:var(--text);margin-bottom:0.65rem;max-width:65ch;">
@@ -569,6 +595,9 @@ function renderAuditWorkspace() {
           </button>
           <button class="chip-btn ${dec.mode === 'dismissed' ? 'active-chip' : ''}" onclick="setClauseDecision('${f.clause_id}', 'dismissed')">
             Keep Original Clause
+          </button>
+          <button class="chip-btn" style="border:1px solid var(--control);" onclick="copySingleClause('${f.clause_id}')">
+            Copy Replacement Clause
           </button>
         </div>
       </div>`;
