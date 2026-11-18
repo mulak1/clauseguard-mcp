@@ -30,17 +30,16 @@ MCP_PROTOCOL_VERSION = "2025-03-26"
 MCP_TOOLS_CATALOG: tuple[dict[str, Any], ...] = (
     {
         "name": "audit_and_redline_contract",
-        "title": "Compare Agreement Against Commercial Playbook & Format Word Track Changes",
+        "title": "Compare Agreement Draft & Format Word Track Changes",
         "description": (
-            "Compares commercial agreement drafts (MSA, Mutual NDA, SaaS Subscription, or Data Processing "
-            "Addendum) in plain English against a selected commercial checklist, calculates a 0–100 checklist "
-            "variance score, and formats suggested Microsoft Word (.docx) Track Changes and a draft "
-            "counterparty discussion summary without modifying external systems. Informational commercial "
-            "checklist and document formatting utility only — does not provide legal advice or substitute "
-            "for review by a qualified attorney."
+            "Compares an agreement draft clause-by-clause against a selected commercial template "
+            "checklist, highlights commercial text differences (such as fee caps, payment windows, "
+            "renewal notice periods, and subprocessor notice windows), and formats a downloadable "
+            "Microsoft Word (.docx) file with native Track Changes. Informational document comparison "
+            "and formatting utility only — does not provide legal advice."
         ),
         "annotations": {
-            "title": "Compare Agreement & Format Word Track Changes",
+            "title": "Compare Agreement Draft & Format Word Track Changes",
             "readOnlyHint": True,
             "destructiveHint": False,
             "idempotentHint": True,
@@ -52,27 +51,27 @@ MCP_TOOLS_CATALOG: tuple[dict[str, Any], ...] = (
             "properties": {
                 "contract_text": {
                     "type": "string",
-                    "description": "Full plain-text wording of the commercial contract to review.",
+                    "description": "Plain-text wording of the commercial agreement draft to compare.",
                 },
                 "playbook": {
                     "type": "string",
                     "enum": ["founder_friendly", "saas_vendor", "gdpr_dpa", "hipaa_baa"],
                     "default": "founder_friendly",
-                    "description": "Commercial checklist to compare against: founder_friendly, saas_vendor, gdpr_dpa, or hipaa_baa.",
+                    "description": "Commercial checklist preset to compare against (default: founder_friendly).",
                 },
                 "contract_name": {
                     "type": "string",
-                    "default": "Contract_Redlined.docx",
-                    "description": "Document label for the contract review report.",
+                    "default": "Agreement_Track_Changes.docx",
+                    "description": "Filename for the formatted Microsoft Word (.docx) Track Changes output.",
                 },
                 "author": {
                     "type": "string",
                     "default": "ClauseGuard Document Comparison",
-                    "description": "Reviewer label displayed in the redline summary.",
+                    "description": "Author label displayed in the Word Track Changes markup.",
                 },
                 "api_key": {
                     "type": "string",
-                    "description": "Optional ClauseGuard Professional Plan API key for unlimited monthly agreement reviews.",
+                    "description": "Optional ClauseGuard Professional Plan API key.",
                 },
             },
         },
@@ -251,7 +250,7 @@ def _dispatch_tool_call(
     ) or "anonymous"
 
     try:
-        if tool_name == "audit_and_redline_contract":
+        if tool_name in ("audit_and_redline_contract", "compare_agreement_to_playbook"):
             req = AuditContractRequest(**arguments) if isinstance(arguments, dict) else AuditContractRequest(contract_text=str(arguments))
             quota = check_and_consume_quota(
                 client_id=effective_client,

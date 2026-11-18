@@ -274,8 +274,8 @@ CLAUSE_RULES: tuple[ClauseRule, ...] = (
             r"without\s+subprocessor\s+flow-down\s+restrictions",
         ),
         rationale=(
-            "Privacy regulations require vendors to give you advance written notice before sharing "
-            "your customer data with new third-party subprocessors."
+            "Standard enterprise data checklists specify 30 days advance written notice before "
+            "sharing customer data with new third-party subprocessors."
         ),
         counterparty_note=(
             "We added a 30-day advance written notice requirement before new subprocessors are given "
@@ -318,12 +318,12 @@ CLAUSE_RULES: tuple[ClauseRule, ...] = (
             r"report\s+breaches\s+within\s+(?:30|60|90)\s+days",
         ),
         rationale=(
-            "Data protection laws require you to report breaches within 72 hours. If a vendor waits "
-            "30 days to tell you, your company cannot meet its own legal deadline."
+            "Standard enterprise security checklists specify a 24-to-48 hour incident reporting window "
+            "rather than a 30-to-90 day notification period."
         ),
         counterparty_note=(
             "We updated the security incident reporting window from 30 days to within 24–48 hours "
-            "so we can meet statutory 72-hour reporting timelines."
+            "to align with our standard operational incident-response timeline."
         ),
         compromise=(
             "BREACH NOTIFICATION TIMELINE. Provider shall notify Customer without undue delay and within "

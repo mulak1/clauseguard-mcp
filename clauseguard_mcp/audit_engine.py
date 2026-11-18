@@ -186,7 +186,7 @@ def _detect_missing_protections(
             MissingClauseWarning(
                 clause_name="Data Return or Deletion Upon Termination",
                 importance="ESSENTIAL",
-                why_it_matters="Privacy laws require vendors to delete or return all customer records when the contract ends.",
+                why_it_matters="Standard commercial data-handling checklists include a 30-day clause for returning or deleting customer records when the agreement ends.",
                 suggested_language="RETURN OR DELETION OF DATA. Within thirty (30) days after termination of this Agreement, Provider shall securely delete or return all Customer Data and certify deletion in writing.",
             )
         )
@@ -274,15 +274,15 @@ def _build_executive_summary(
 ) -> str:
     if not findings:
         return (
-            f"We reviewed {contract_name} against the {playbook_label}. "
-            f"The agreement carries a low risk score ({risk_score}/100) with no unusual terms requiring revision."
+            f"We compared {contract_name} against the {playbook_label} checklist. "
+            f"The draft shows a low checklist variance score ({risk_score}/100) with no unusual commercial terms flagged."
         )
     titles = ", ".join(f.title for f in findings[:3])
     more = f" and {len(findings) - 3} more" if len(findings) > 3 else ""
     return (
-        f"We reviewed {contract_name} against the {playbook_label}. "
-        f"We flagged {len(findings)} clause(s) outside standard commercial practice — {titles}{more} — "
-        "and prepared a clean Word document with Track Changes ready for review."
+        f"We compared {contract_name} against the {playbook_label} checklist. "
+        f"We noted {len(findings)} clause(s) that differ from the checklist — {titles}{more} — "
+        "and formatted a Microsoft Word (.docx) document with Track Changes for discussion with your team and counsel."
     )
 
 
@@ -292,14 +292,14 @@ def _build_counterparty_email(
 ) -> str:
     if not findings:
         return (
-            f"Hi team,\n\nThank you for sending over {contract_name}. We completed our review and "
-            "have no requested revisions—we are ready to proceed to signature.\n\nBest regards,"
+            f"Hi team,\n\nThank you for sending over {contract_name}. We completed our commercial checklist "
+            "comparison and have no requested text revisions to flag for discussion.\n\nBest regards,"
         )
     bullets = "\n".join(f"• {f.title}: {f.counterparty_note}" for f in findings)
     return (
-        f"Hi team,\n\nThank you for sharing {contract_name}. We reviewed the draft and attached a "
-        "Word version with a few standard, balanced revisions in Track Changes so we can move "
-        "quickly toward signature:\n\n"
+        f"Hi team,\n\nThank you for sharing {contract_name}. We compared the draft against our standard "
+        "commercial checklist and attached a Word version with proposed edits in Track Changes for "
+        "discussion with our respective teams:\n\n"
         f"{bullets}\n\n"
         "Please let us know if these adjustments work on your end or if a quick call would be helpful.\n\n"
         "Best regards,"

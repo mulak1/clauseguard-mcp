@@ -46,7 +46,7 @@
   "tools": [
     {
       "name": "audit_and_redline_contract",
-      "title": "Compare Agreement & Format Word Track Changes",
+      "title": "Compare Agreement Draft & Format Word Track Changes",
       "annotations": {
         "readOnlyHint": true,
         "destructiveHint": false,

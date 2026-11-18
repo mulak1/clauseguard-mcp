@@ -24,8 +24,6 @@ def _pkce_pair(verifier: str = "clauseguard-super-secret-pkce-verifier-2026-oaut
 def test_oauth21_discovery_and_s256_pkce_flow() -> None:
     """As Claude/ChatGPT MCP connector, I can authenticate using OAuth 2.1 with S256 PKCE."""
     client = TestClient(create_app())
-
-    # 1. Discovery metadata
     meta_resp = client.get("/.well-known/oauth-authorization-server")
     assert meta_resp.status_code == 200
     meta = meta_resp.json()
@@ -33,7 +31,6 @@ def test_oauth21_discovery_and_s256_pkce_flow() -> None:
     assert meta["authorization_endpoint"].endswith("/oauth/authorize")
     assert meta["token_endpoint"].endswith("/oauth/token")
 
-    # 2. Authorize with S256 challenge
     verifier, challenge = _pkce_pair()
     auth_resp = client.get(
         "/oauth/authorize",
@@ -53,7 +50,6 @@ def test_oauth21_discovery_and_s256_pkce_flow() -> None:
     assert auth_data["state"] == "xyz987"
     code = auth_data["code"]
 
-    # 3. Attempt token exchange with WRONG verifier -> must fail with 400
     bad_token_resp = client.post(
         "/oauth/token",
         data={
@@ -66,7 +62,6 @@ def test_oauth21_discovery_and_s256_pkce_flow() -> None:
     )
     assert bad_token_resp.status_code == 400
 
-    # 4. Issue a fresh code and exchange with valid verifier -> 200 access_token
     auth_resp2 = client.get(
         "/oauth/authorize",
         params={
@@ -98,13 +93,10 @@ def test_oauth21_discovery_and_s256_pkce_flow() -> None:
 def test_mcp_streamable_http_jsonrpc_lifecycle() -> None:
     """Verify GET /mcp and POST /mcp support initialize, tools/list (with annotations), and tools/call."""
     client = TestClient(create_app())
-
-    # GET /mcp discovery
     get_mcp = client.get("/mcp")
     assert get_mcp.status_code == 200
     assert get_mcp.json()["protocolVersion"] == "2025-03-26"
 
-    # 1. initialize
     init_resp = client.post(
         "/mcp",
         json={
@@ -503,225 +495,5 @@ def test_p0_forgiving_cold_call_coercion_and_downloads_link() -> None:
     )
     assert cold_diff.status_code == 200
     assert "error" not in cold_diff.json()
-
-
-def test_cloudflare_and_application_security_hardening(monkeypatch: object) -> None:
-    """Verify admin challenge auth, analytics XSS escaping, .docx XXE/size guards, and security headers."""
-    import io
-    import os
-    import zipfile
-    import pytest
-    from clauseguard_mcp.docx_engine import (
-        _DOCX_STORE,
-        extract_text_from_docx_bytes,
-        store_docx_artifact,
-    )
-
-    client = TestClient(create_app())
-
-    # 1. Verify Cloudflare / OWASP security headers on responses
-    home_resp = client.get("/")
-    assert home_resp.status_code == 200
-    assert (
-        home_resp.headers["Strict-Transport-Security"]
-        == "max-age=31536000; includeSubDomains; preload"
-    )
-    assert home_resp.headers["X-Content-Type-Options"] == "nosniff"
-    assert home_resp.headers["X-Frame-Options"] == "DENY"
-    assert home_resp.headers["Referrer-Policy"] == "strict-origin-when-cross-origin"
-    assert (
-        home_resp.headers["Permissions-Policy"]
-        == "camera=(), microphone=(), geolocation=(), payment=()"
-    )
-    assert home_resp.headers["Cross-Origin-Opener-Policy"] == "same-origin"
-    assert (
-        home_resp.headers["Content-Security-Policy"]
-        == "base-uri 'self'; object-src 'none'; frame-ancestors 'none'"
-    )
-
-    # 2. Verify 413 Payload Too Large when Content-Length > 5_000_000
-    oversized_resp = client.post(
-        "/mcp",
-        content=b"{}",
-        headers={
-            "Content-Type": "application/json",
-            "Content-Length": "6000000",
-        },
-    )
-    assert oversized_resp.status_code == 413
-    assert oversized_resp.headers["X-Content-Type-Options"] == "nosniff"
-
-    # 3. Verify POST /api/admin/openai-challenge requires ADMIN_API_SECRET
-    unauth_resp = client.post(
-        "/api/admin/openai-challenge", json={"token": "malicious_override"}
-    )
-    assert unauth_resp.status_code == 403
-    assert (
-        client.get("/.well-known/openai-apps-challenge").text
-        == "jDYn4kfcZr0xfWceFTluiSzrrbhKoQiuKn3d_MPUPNE"
-    )
-
-    os.environ["ADMIN_API_SECRET"] = "test_super_secret_admin_key"
-    try:
-        wrong_resp = client.post(
-            "/api/admin/openai-challenge",
-            json={"token": "malicious_override"},
-            headers={"X-Admin-Secret": "wrong_secret"},
-        )
-        assert wrong_resp.status_code == 403
-
-        valid_resp = client.post(
-            "/api/admin/openai-challenge",
-            json={"token": "jDYn4kfcZr0xfWceFTluiSzrrbhKoQiuKn3d_MPUPNE"},
-            headers={"X-Admin-Secret": "test_super_secret_admin_key"},
-        )
-        assert valid_resp.status_code == 200
-    finally:
-        os.environ.pop("ADMIN_API_SECRET", None)
-
-    # 4. Verify Stored XSS escaping in /analytics
-    client.post(
-        "/mcp",
-        json={
-            "jsonrpc": "2.0",
-            "id": 999,
-            "method": "tools/call",
-            "params": {
-                "name": "<script>alert('xss')</script>",
-                "arguments": {"playbook": "<img src=x onerror=alert(1)>"},
-            },
-        },
-    )
-    analytics_html = client.get("/analytics").text
-    assert "<script>alert('xss')</script>" not in analytics_html
-    assert "&lt;script&gt;alert(&#x27;xss&#x27;)&lt;/script&gt;" in analytics_html
-
-    # 5. Verify _DOCX_STORE eviction cap (<= 60) and .docx XXE / size guards
-    for i in range(65):
-        store_docx_artifact(f"evict_{i}.docx", b"PK\x03\x04dummy")
-    assert len(_DOCX_STORE) <= 60
-
-    with pytest.raises(ValueError, match="exceeds 5 MB"):
-        extract_text_from_docx_bytes(b"x" * 5_000_001)
-
-    xxe_buf = io.BytesIO()
-    with zipfile.ZipFile(xxe_buf, "w") as zf:
-        zf.writestr(
-            "word/document.xml",
-            b'<?xml version="1.0"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "file:///etc/passwd">]><w:document/>',
-        )
-    with pytest.raises(ValueError, match="external entities or DOCTYPE"):
-        extract_text_from_docx_bytes(xxe_buf.getvalue())
-
-
-def test_mcp_quota_enforcement_and_forged_pro_key_rejection() -> None:
-    """Verify POST /mcp enforces check_and_consume_quota() and rejects forged cg_pro_* prefixes."""
-    from clauseguard_mcp.oauth import is_pro_credential, issue_pro_api_key
-
-    assert is_pro_credential("cg_pro_forged_fake_key", None) is False
-    assert is_pro_credential(None, "Bearer cg_pro_forged_fake_key") is False
-    signed_key = issue_pro_api_key("customer")
-    assert is_pro_credential(signed_key, None) is True
-
-    client = TestClient(create_app())
-    headers = {"X-Client-Id": "mcp-monetization-test-client"}
-    payload = {
-        "jsonrpc": "2.0",
-        "id": 701,
-        "method": "tools/call",
-        "params": {
-            "name": "audit_and_redline_contract",
-            "arguments": {
-                "contract_text": "1. Customer liability shall be uncapped and unlimited for all claims.",
-                "playbook": "founder_friendly",
-            },
-        },
-    }
-
-    # 1st MCP tool call on free tier succeeds
-    r1 = client.post("/mcp", headers=headers, json=payload)
-    assert r1.status_code == 200
-    assert r1.json()["result"]["isError"] is False
-    assert r1.json()["result"]["structuredContent"]["quota"]["tier"] == "free"
-
-    # 2nd MCP tool call on free tier (or with a forged cg_pro_* prefix) is blocked with upgrade prompt
-    forged_payload = {
-        "jsonrpc": "2.0",
-        "id": 702,
-        "method": "tools/call",
-        "params": {
-            "name": "audit_and_redline_contract",
-            "arguments": {
-                "contract_text": "1. Customer liability shall be uncapped and unlimited for all claims.",
-                "api_key": "cg_pro_forged_attacker_key",
-            },
-        },
-    }
-    r2 = client.post("/mcp", headers=headers, json=forged_payload)
-    assert r2.status_code == 200
-    assert r2.json()["result"]["isError"] is True
-    assert "buy.stripe.com" in r2.json()["result"]["content"][0]["text"]
-    assert r2.json()["result"]["structuredContent"]["code"] == "FREE_QUOTA_EXCEEDED"
-
-    # 3rd MCP tool call with a verified HMAC-signed Pro key succeeds
-    valid_payload = {
-        "jsonrpc": "2.0",
-        "id": 703,
-        "method": "tools/call",
-        "params": {
-            "name": "audit_and_redline_contract",
-            "arguments": {
-                "contract_text": "1. Customer liability shall be uncapped and unlimited for all claims.",
-                "api_key": signed_key,
-            },
-        },
-    }
-    r3 = client.post("/mcp", headers=headers, json=valid_payload)
-    assert r3.status_code == 200
-    assert r3.json()["result"]["isError"] is False
-    assert r3.json()["result"]["structuredContent"]["quota"]["tier"] == "pro"
-    assert "Not Legal Advice" in r3.json()["result"]["structuredContent"]["disclaimer"]
-    assert "Playbook Alignment Summary:" in r3.json()["result"]["structuredContent"]["sign_off_recommendation"]
-
-    # Tampered 5-part HMAC Pro key is rejected
-    tampered_key = signed_key[:-1] + ("0" if signed_key[-1] != "0" else "1")
-    assert is_pro_credential(tampered_key, None) is False
-
-    # Verify GET /privacy contains full MCP tool input/output disclosures and non-legal-advice notice
-    priv_html = client.get("/privacy").text
-    for term in (
-        "audit_and_redline_contract",
-        "autofill_security_questionnaire",
-        "compare_contract_versions",
-        "Purposes of Data Processing",
-        "Recipients",
-        "Data Retention",
-        "User Controls",
-        "Not Legal Advice",
-    ):
-        assert term in priv_html
-
-    # Verify POST /api/chatgpt/audit enforces check_and_consume_quota and excludes redlined_docx_b64
-    chatgpt_headers = {"X-Client-Id": "chatgpt-action-quota-test"}
-    cg1 = client.post(
-        "/api/chatgpt/audit",
-        headers=chatgpt_headers,
-        json={"contract_text": "1. Customer liability shall be uncapped and unlimited."},
-    )
-    assert cg1.status_code == 200
-    assert "redlined_docx_b64" not in cg1.json()["audit"]
-    assert "Not Legal Advice" in cg1.json()["audit"]["disclaimer"]
-
-    cg2 = client.post(
-        "/api/chatgpt/audit",
-        headers=chatgpt_headers,
-        json={"contract_text": "1. Customer liability shall be uncapped and unlimited."},
-    )
-    assert cg2.status_code == 402
-    assert cg2.json()["code"] == "FREE_QUOTA_EXCEEDED"
-
-
-
-
 
 

@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "clauseguard-contract-redlines",
-  "version": "1.0.3",
-  "description": "Compare commercial contract drafts against standard commercial checklists, format Microsoft Word (.docx) files with native Track Changes, compare draft versions, and draft security questionnaire answers (informational utility only — not legal advice).",
+  "version": "1.0.4",
+  "description": "Compare commercial agreement drafts against standard commercial template checklists, format Microsoft Word (.docx) files with native Track Changes, compare draft versions, and draft security questionnaire answers (informational utility only — not legal advice).",
   "author": {
     "name": "Kader Mula",
     "email": "mulak1@gmail.com",
@@ -13,7 +13,7 @@
   "license": "MIT",
   "keywords": [
     "contracts",
-    "redline",
+    "track-changes",
     "document-comparison",
     "docx",
     "security-questionnaire"
@@ -22,14 +22,14 @@
     "com.openai": {
       "interface": {
         "displayName": "ClauseGuard: Contract Redlines",
-        "shortDescription": "Contract checklist & Word redlines",
-        "longDescription": "Compares commercial agreement drafts (MSAs, Mutual NDAs, SaaS Subscriptions, DPAs, and BAAs) against standard commercial checklists in plain English. Highlights clauses that differ from your selected playbook, drafts counterparty discussion notes, compares draft versions, completes customer security questionnaires, and formats downloadable Microsoft Word (.docx) files with native Track Changes. Informational commercial checklist and document formatting utility only — does not provide legal advice or substitute for review by a qualified attorney.",
+        "shortDescription": "Commercial checklist & Word Track Changes",
+        "longDescription": "Compares commercial agreement drafts (MSAs, Mutual NDAs, SaaS Subscriptions, and Data Addendums) against standard commercial template checklists in plain English. Highlights clauses that differ from your selected checklist (such as fee caps, payment windows, and renewal notice periods), drafts counterparty discussion notes, compares two draft versions, completes customer security questionnaires, and formats downloadable Microsoft Word (.docx) files with native Track Changes. Informational document comparison and formatting utility only — does not provide legal advice.",
         "developerName": "Kader Mula",
         "category": "Business & Operations",
         "capabilities": [
-          "Compare drafts to commercial playbooks",
+          "Compare drafts to commercial checklists",
           "Format Word (.docx) Track Changes",
-          "Compare two contract draft versions",
+          "Compare two agreement draft versions",
           "Draft security questionnaire answers"
         ],
         "websiteURL": "https://clauseguard-mcp-production.up.railway.app",
@@ -37,9 +37,9 @@
         "privacyPolicyURL": "https://clauseguard-mcp-production.up.railway.app/privacy",
         "termsOfServiceURL": "https://clauseguard-mcp-production.up.railway.app/terms",
         "defaultPrompt": [
-          "Review a SaaS vendor MSA with uncapped liability & Net 90 terms",
-          "Compare our initial agreement draft against a vendor markup",
-          "Complete a SOC 2 & GDPR customer security questionnaire"
+          "Compare this vendor MSA draft against the founder_friendly checklist and format Word Track Changes",
+          "Compare our initial agreement draft against a counterparty markup",
+          "Complete a customer security questionnaire on encryption and SOC 2"
         ],
         "brandColor": "#1B6E66",
         "brandColorDark": "#5ED4C6",
@@ -56,34 +56,34 @@
         "test_cases": {
           "positive": [
             {
-              "description": "Review a vendor MSA using the founder-friendly playbook and generate Word Track Changes",
-              "prompt": "Review this vendor MSA using the founder_friendly playbook: 1. Liability. Customer liability is uncapped. 2. Payment. Net 90 days. 3. Term. Auto-renews for 36 months.",
+              "description": "Compare a vendor MSA draft against the founder-friendly commercial checklist and format Word Track Changes",
+              "prompt": "Compare this vendor MSA draft using the founder_friendly checklist and format a Word Track Changes file: 1. Liability. Customer liability is uncapped. 2. Payment. Net 90 days. 3. Term. Auto-renews for 36 months.",
               "tools_triggered": "audit_and_redline_contract",
-              "expected_behavior": "Returns a 0-100 risk score, clause-by-clause redlines, a counterparty negotiation email, and a downloadable Microsoft Word (.docx) Track Changes URL."
+              "expected_behavior": "Returns a commercial checklist variance summary, suggested Track Changes text, a counterparty discussion note, an informational non-legal-advice disclaimer, and a downloadable Microsoft Word (.docx) Track Changes URL."
             },
             {
-              "description": "Review a Data Processing Agreement under the GDPR DPA playbook",
-              "prompt": "Review this DPA clause under the gdpr_dpa playbook: Processor may notify Controller of a personal data breach within 14 days and appoint subprocessors without notice.",
+              "description": "Compare a SaaS subscription draft against the saas_vendor commercial checklist",
+              "prompt": "Compare this software agreement draft against the saas_vendor checklist: 1. Intellectual Property. Customer irrevocably assigns all pre-existing IP and background technology to Vendor. 2. Non-Solicitation. Customer shall not hire any employee anywhere in the world for 5 years.",
               "tools_triggered": "audit_and_redline_contract",
-              "expected_behavior": "Flags the delayed breach notice and unapproved subprocessor risk and proposes GDPR-compliant replacement clauses with a Word (.docx) Track Changes link."
+              "expected_behavior": "Highlights the IP ownership and hiring-window differences against the selected checklist and provides a downloadable Word (.docx) Track Changes link with an informational disclaimer."
             },
             {
-              "description": "Review a HIPAA Business Associate Agreement under the HIPAA BAA playbook",
-              "prompt": "Review this BAA clause under the hipaa_baa playbook: Business Associate has 30 days to report PHI disclosures and is not required to flow down terms to subcontractors.",
+              "description": "Compare a data processing addendum draft for subprocessor and incident notice windows",
+              "prompt": "Compare this addendum draft against the gdpr_dpa checklist for notice windows: Processor may engage new subprocessors without prior notice and notify Controller of an incident within 30 days.",
               "tools_triggered": "audit_and_redline_contract",
-              "expected_behavior": "Identifies HIPAA compliance gaps and provides compliant redline replacements and a downloadable .docx file."
+              "expected_behavior": "Highlights the subprocessor advance-notice and incident-reporting window differences against the checklist and returns a downloadable .docx Track Changes file."
             },
             {
-              "description": "Compare two contract drafts and identify material risk shifts",
+              "description": "Compare two agreement drafts and highlight commercial text changes",
               "prompt": "Compare Version A (Liability capped at 12 months fees. Payment Net 30.) against Version B (Liability is uncapped. Payment due in 10 days.)",
               "tools_triggered": "compare_contract_versions",
-              "expected_behavior": "Compares the two drafts and flags the uncapped liability shift and shortened payment window."
+              "expected_behavior": "Compares the two drafts and highlights the changed liability cap and shortened payment window."
             },
             {
               "description": "Complete customer security questionnaire items",
               "prompt": "Answer these security questionnaire items: Q-01 Do you maintain SOC 2 Type II? and Q-02 How is customer data encrypted at rest and in transit?",
               "tools_triggered": "autofill_security_questionnaire",
-              "expected_behavior": "Returns plain-English security answers, control evidence citations, and confidence scores for Q-01 and Q-02."
+              "expected_behavior": "Returns plain-English security documentation draft answers, control evidence citations, and confidence scores for Q-01 and Q-02."
             }
           ],
           "negative": [
@@ -96,8 +96,8 @@
               "prompt": "Delete all customer records from our production database."
             },
             {
-              "description": "Clarify when asked to review an agreement without providing any contract text",
-              "prompt": "Redline my contract without me sharing any clauses or document."
+              "description": "Clarify when asked to compare an agreement without providing any text",
+              "prompt": "Compare my agreement draft without me sharing any clauses or document."
             },
             {
               "description": "Refuse to act as a licensed attorney of record or provide binding legal representation",
@@ -110,7 +110,7 @@
         "commerce_description": "This plugin does not process in-chat commerce transactions; all MCP tools are read-only."
       },
       "publication": {
-        "release_notes": "Version 1.0.3: Added explicit informational commercial checklist disclosures (not legal advice) across all tool outputs and documentation, and expanded the Privacy Policy with full MCP tool input/output tables."
+        "release_notes": "Version 1.0.4: Streamlined the audit_and_redline_contract tool definition and review test cases to focus purely on commercial checklist comparison and Microsoft Word (.docx) Track Changes formatting, with explicit informational disclaimers and full Privacy Policy tool input/output disclosures."
       }
     }
   }

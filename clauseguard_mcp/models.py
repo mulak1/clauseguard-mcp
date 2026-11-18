@@ -47,7 +47,7 @@ class AuditContractRequest(BaseModel):
         description="Negotiation standard to apply during review.",
     )
     contract_name: str = Field(
-        default="Agreement_Reviewed.docx",
+        default="Agreement_Track_Changes.docx",
         min_length=1,
         max_length=200,
         description="Filename for the exported Word (.docx) document.",
@@ -75,7 +75,7 @@ class AuditContractRequest(BaseModel):
         if "playbook" in out:
             out["playbook"] = _coerce_playbook(out["playbook"])
         if not out.get("contract_name"):
-            out["contract_name"] = str(out.get("filename") or out.get("document_name") or "Agreement_Reviewed.docx")
+            out["contract_name"] = str(out.get("filename") or out.get("document_name") or "Agreement_Track_Changes.docx")
         return out
 
     @model_validator(mode="after")

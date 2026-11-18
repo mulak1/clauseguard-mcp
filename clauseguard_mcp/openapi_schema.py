@@ -27,12 +27,12 @@ def build_chatgpt_openapi_spec() -> dict[str, Any]:
         "info": {
             "title": "ClauseGuard: Contract Redlines",
             "description": (
-                "Compare commercial agreement drafts against standard commercial playbooks in plain English, "
+                "Compare commercial agreement drafts against standard commercial template checklists in plain English, "
                 "format Microsoft Word (.docx) files with native Track Changes, compare draft versions, and "
                 "draft customer security questionnaire responses. Informational checklist & document formatting "
-                "utility only — does not provide legal advice or substitute for review by a licensed attorney."
+                "utility only — does not provide legal advice."
             ),
-            "version": "1.0.3",
+            "version": "1.0.4",
         },
         "servers": [{"url": "https://clauseguard-mcp-production.up.railway.app"}],
         "paths": {
@@ -40,8 +40,8 @@ def build_chatgpt_openapi_spec() -> dict[str, Any]:
                 "post": {
                     "operationId": "auditAndRedlineContract",
                     "summary": (
-                        "Compare a commercial contract draft against a selected playbook checklist and format a "
-                        "downloadable Word (.docx) file with Track Changes (informational checklist only — not legal advice)."
+                        "Compare an agreement draft against a selected commercial template checklist and format a "
+                        "downloadable Word (.docx) file with Track Changes (informational utility only — not legal advice)."
                     ),
                     "x-openai-isConsequential": False,
                     "requestBody": {
@@ -54,22 +54,22 @@ def build_chatgpt_openapi_spec() -> dict[str, Any]:
                                     "properties": {
                                         "contract_text": {
                                             "type": "string",
-                                            "description": "Full plain-text wording of the commercial contract draft to compare.",
+                                            "description": "Plain-text wording of the commercial agreement draft to compare.",
                                         },
                                         "playbook": {
                                             "type": "string",
                                             "enum": ["founder_friendly", "saas_vendor", "gdpr_dpa", "hipaa_baa"],
                                             "default": "founder_friendly",
-                                            "description": "Commercial checklist to apply: founder_friendly, saas_vendor, gdpr_dpa, or hipaa_baa.",
+                                            "description": "Commercial checklist preset to compare against (default: founder_friendly).",
                                         },
                                         "contract_name": {
                                             "type": "string",
-                                            "default": "Agreement_Redlined.docx",
-                                            "description": "Filename for the generated Microsoft Word (.docx) Track Changes document.",
+                                            "default": "Agreement_Track_Changes.docx",
+                                            "description": "Filename for the formatted Microsoft Word (.docx) Track Changes output.",
                                         },
                                         "api_key": {
                                             "type": "string",
-                                            "description": "Optional ClauseGuard Professional Plan API key for unlimited monthly reviews.",
+                                            "description": "Optional ClauseGuard Professional Plan API key.",
                                         },
                                     },
                                 }
