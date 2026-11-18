@@ -296,11 +296,12 @@ def test_mcp_quota_enforcement_and_forged_pro_key_rejection() -> None:
     assert any("Standard commercial data-handling checklists" in w.why_it_matters for w in dpa_res.missing_clauses)
     assert any("Standard enterprise" in f.rationale for f in dpa_res.findings)
 
-    # 3. Verify GET /openai-plugin.zip archive sync with plugin.json v1.0.4
+    # 3. Verify GET /openai-plugin.zip archive sync with plugin.json v1.0.4 and no deprecated interface.screenshots
     zip_resp = client.get("/openai-plugin.zip")
     assert zip_resp.status_code == 200
     with zipfile.ZipFile(io.BytesIO(zip_resp.content), "r") as zf:
         archived_plugin = json.loads(zf.read("plugin.json").decode("utf-8"))
         assert archived_plugin["version"] == "1.0.4"
+        assert "screenshots" not in archived_plugin["extensions"]["com.openai"]["interface"]
         assert "mcp.json" in zf.namelist()
 
