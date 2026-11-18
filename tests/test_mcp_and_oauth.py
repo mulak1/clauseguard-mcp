@@ -614,5 +614,114 @@ def test_cloudflare_and_application_security_hardening(monkeypatch: object) -> N
         extract_text_from_docx_bytes(xxe_buf.getvalue())
 
 
+def test_mcp_quota_enforcement_and_forged_pro_key_rejection() -> None:
+    """Verify POST /mcp enforces check_and_consume_quota() and rejects forged cg_pro_* prefixes."""
+    from clauseguard_mcp.oauth import is_pro_credential, issue_pro_api_key
+
+    assert is_pro_credential("cg_pro_forged_fake_key", None) is False
+    assert is_pro_credential(None, "Bearer cg_pro_forged_fake_key") is False
+    signed_key = issue_pro_api_key("customer")
+    assert is_pro_credential(signed_key, None) is True
+
+    client = TestClient(create_app())
+    headers = {"X-Client-Id": "mcp-monetization-test-client"}
+    payload = {
+        "jsonrpc": "2.0",
+        "id": 701,
+        "method": "tools/call",
+        "params": {
+            "name": "audit_and_redline_contract",
+            "arguments": {
+                "contract_text": "1. Customer liability shall be uncapped and unlimited for all claims.",
+                "playbook": "founder_friendly",
+            },
+        },
+    }
+
+    # 1st MCP tool call on free tier succeeds
+    r1 = client.post("/mcp", headers=headers, json=payload)
+    assert r1.status_code == 200
+    assert r1.json()["result"]["isError"] is False
+    assert r1.json()["result"]["structuredContent"]["quota"]["tier"] == "free"
+
+    # 2nd MCP tool call on free tier (or with a forged cg_pro_* prefix) is blocked with upgrade prompt
+    forged_payload = {
+        "jsonrpc": "2.0",
+        "id": 702,
+        "method": "tools/call",
+        "params": {
+            "name": "audit_and_redline_contract",
+            "arguments": {
+                "contract_text": "1. Customer liability shall be uncapped and unlimited for all claims.",
+                "api_key": "cg_pro_forged_attacker_key",
+            },
+        },
+    }
+    r2 = client.post("/mcp", headers=headers, json=forged_payload)
+    assert r2.status_code == 200
+    assert r2.json()["result"]["isError"] is True
+    assert "buy.stripe.com" in r2.json()["result"]["content"][0]["text"]
+    assert r2.json()["result"]["structuredContent"]["code"] == "FREE_QUOTA_EXCEEDED"
+
+    # 3rd MCP tool call with a verified HMAC-signed Pro key succeeds
+    valid_payload = {
+        "jsonrpc": "2.0",
+        "id": 703,
+        "method": "tools/call",
+        "params": {
+            "name": "audit_and_redline_contract",
+            "arguments": {
+                "contract_text": "1. Customer liability shall be uncapped and unlimited for all claims.",
+                "api_key": signed_key,
+            },
+        },
+    }
+    r3 = client.post("/mcp", headers=headers, json=valid_payload)
+    assert r3.status_code == 200
+    assert r3.json()["result"]["isError"] is False
+    assert r3.json()["result"]["structuredContent"]["quota"]["tier"] == "pro"
+    assert "Not Legal Advice" in r3.json()["result"]["structuredContent"]["disclaimer"]
+    assert "Playbook Alignment Summary:" in r3.json()["result"]["structuredContent"]["sign_off_recommendation"]
+
+    # Tampered 5-part HMAC Pro key is rejected
+    tampered_key = signed_key[:-1] + ("0" if signed_key[-1] != "0" else "1")
+    assert is_pro_credential(tampered_key, None) is False
+
+    # Verify GET /privacy contains full MCP tool input/output disclosures and non-legal-advice notice
+    priv_html = client.get("/privacy").text
+    for term in (
+        "audit_and_redline_contract",
+        "autofill_security_questionnaire",
+        "compare_contract_versions",
+        "Purposes of Data Processing",
+        "Recipients",
+        "Data Retention",
+        "User Controls",
+        "Not Legal Advice",
+    ):
+        assert term in priv_html
+
+    # Verify POST /api/chatgpt/audit enforces check_and_consume_quota and excludes redlined_docx_b64
+    chatgpt_headers = {"X-Client-Id": "chatgpt-action-quota-test"}
+    cg1 = client.post(
+        "/api/chatgpt/audit",
+        headers=chatgpt_headers,
+        json={"contract_text": "1. Customer liability shall be uncapped and unlimited."},
+    )
+    assert cg1.status_code == 200
+    assert "redlined_docx_b64" not in cg1.json()["audit"]
+    assert "Not Legal Advice" in cg1.json()["audit"]["disclaimer"]
+
+    cg2 = client.post(
+        "/api/chatgpt/audit",
+        headers=chatgpt_headers,
+        json={"contract_text": "1. Customer liability shall be uncapped and unlimited."},
+    )
+    assert cg2.status_code == 402
+    assert cg2.json()["code"] == "FREE_QUOTA_EXCEEDED"
+
+
+
+
 
 

@@ -14,62 +14,24 @@ from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse
 from pydantic import ValidationError
 import uvicorn
 
-from clauseguard_mcp.analytics import (
-    detect_source,
-    get_analytics_snapshot,
-    record_event,
-    render_analytics_html,
-)
-from clauseguard_mcp.audit_engine import (
-    audit_and_redline_contract,
-    build_custom_redlined_docx,
-)
-from clauseguard_mcp.docx_engine import (
-    extract_text_from_b64_docx,
-    get_docx_artifact,
-    get_docx_by_filename,
-)
-from clauseguard_mcp.mcp_protocol import (
-    MCP_PROTOCOL_VERSION,
-    MCP_TOOLS_CATALOG,
-    handle_mcp_jsonrpc,
-)
-from clauseguard_mcp.models import (
-    AuditContractRequest,
-    CompareVersionsRequest,
-    CustomDocxRequest,
-    QuestionnaireRequest,
-)
+from clauseguard_mcp.analytics import detect_source, get_analytics_snapshot, record_event, render_analytics_html
+from clauseguard_mcp.audit_engine import audit_and_redline_contract, build_custom_redlined_docx
+from clauseguard_mcp.docx_engine import extract_text_from_b64_docx, get_docx_artifact, get_docx_by_filename
+from clauseguard_mcp.mcp_protocol import MCP_PROTOCOL_VERSION, MCP_TOOLS_CATALOG, handle_mcp_jsonrpc
+from clauseguard_mcp.models import AuditContractRequest, CompareVersionsRequest, CustomDocxRequest, QuestionnaireRequest
 from clauseguard_mcp.oauth import (
-    PRO_PRICE_LABEL,
-    check_and_consume_quota,
-    exchange_code_for_token,
-    get_oauth_metadata,
-    issue_authorization_code,
+    PRO_PRICE_LABEL, STRIPE_UPGRADE_URL, _is_prod_runtime,
+    check_and_consume_quota, exchange_code_for_token, get_oauth_metadata, issue_authorization_code,
 )
-from clauseguard_mcp.playbooks import (
-    SAMPLE_CONTRACTS,
-    SAMPLE_DIFF_VERSIONS,
-    SAMPLE_QUESTIONNAIRE,
-)
-from clauseguard_mcp.questionnaire_engine import (
-    autofill_security_questionnaire,
-    compare_contract_versions,
-)
-from clauseguard_mcp.studio_pages import render_about_html, render_docs_html
-from clauseguard_mcp.studio_ui import (
-    render_privacy_html,
-    render_studio_html,
-    render_terms_html,
-)
-
+from clauseguard_mcp.openapi_schema import build_chatgpt_openapi_spec
+from clauseguard_mcp.playbooks import SAMPLE_CONTRACTS, SAMPLE_DIFF_VERSIONS, SAMPLE_QUESTIONNAIRE
+from clauseguard_mcp.questionnaire_engine import autofill_security_questionnaire, compare_contract_versions
+from clauseguard_mcp.studio_pages import render_about_html, render_docs_html, render_privacy_html, render_terms_html
+from clauseguard_mcp.studio_ui import render_studio_html
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 _OPENAI_CHALLENGE_STATE: dict[str, str] = {
-    "token": os.environ.get(
-        "OPENAI_APPS_CHALLENGE",
-        "jDYn4kfcZr0xfWceFTluiSzrrbhKoQiuKn3d_MPUPNE",
-    ).strip()
+    "token": os.environ.get("OPENAI_APPS_CHALLENGE", "jDYn4kfcZr0xfWceFTluiSzrrbhKoQiuKn3d_MPUPNE").strip()
 }
 
 
@@ -77,11 +39,11 @@ def create_app() -> FastAPI:
     """Create and configure the ClauseGuard MCP FastAPI application."""
     app = FastAPI(
         title="ClauseGuard MCP",
-        version="1.0.0",
+        version="1.0.3",
         docs_url="/openapi-docs",
         description=(
-            "Commercial Contract Review, Playbook Redlining (Microsoft Word Track Changes .docx), "
-            "Draft Comparison & Security Questionnaire Desk."
+            "Commercial Playbook Comparison, Microsoft Word (.docx) Track Changes Formatter, "
+            "Draft Comparison & Security Questionnaire Desk (Informational Checklist Only — Not Legal Advice)."
         ),
     )
 
@@ -114,7 +76,8 @@ def create_app() -> FastAPI:
 
     @app.get("/", response_class=HTMLResponse)
     def get_studio(request: Request) -> HTMLResponse:
-        if "pro_activated=1" in str(request.url.query):
+        sid = request.query_params.get("session_id", "").strip()
+        if request.query_params.get("pro_activated") == "1" and sid.startswith("cs_"):
             record_event(event_type="pro_unlock", source="Web Desk", detail="Stripe Redirect")
         else:
             record_event(event_type="page_view", source="Web Desk", detail="/")
@@ -189,21 +152,10 @@ def create_app() -> FastAPI:
     async def set_openai_challenge(request: Request) -> JSONResponse:
         expected_secret = os.environ.get("ADMIN_API_SECRET", "").strip()
         auth_header = (request.headers.get("authorization") or "").strip()
-        bearer_secret = (
-            auth_header[7:].strip()
-            if auth_header.lower().startswith("bearer ")
-            else ""
-        )
-        provided_secret = (
-            request.headers.get("x-admin-secret") or bearer_secret or ""
-        ).strip()
-        if not expected_secret or not hmac.compare_digest(
-            provided_secret, expected_secret
-        ):
-            return JSONResponse(
-                status_code=403,
-                content={"error": "Forbidden: valid admin secret required"},
-            )
+        bearer_secret = auth_header[7:].strip() if auth_header.lower().startswith("bearer ") else ""
+        provided_secret = (request.headers.get("x-admin-secret") or bearer_secret or "").strip()
+        if not expected_secret or not hmac.compare_digest(provided_secret, expected_secret):
+            return JSONResponse(status_code=403, content={"error": "Forbidden: valid admin secret required"})
         raw = await request.json()
         token = str(raw.get("token", "")).strip()
         _OPENAI_CHALLENGE_STATE["token"] = token
@@ -215,50 +167,34 @@ def create_app() -> FastAPI:
         if not zip_path.exists():
             return JSONResponse(status_code=404, content={"error": "ZIP not found"})
         return Response(
-            content=zip_path.read_bytes(),
-            media_type="application/zip",
+            content=zip_path.read_bytes(), media_type="application/zip",
             headers={"Content-Disposition": 'attachment; filename="clauseguard-openai-plugin.zip"'},
         )
 
     @app.get("/.well-known/oauth-authorization-server")
     def oauth_discovery(request: Request) -> Response:
         base_url = str(request.base_url).rstrip("/")
-        if (
-            request.headers.get("x-forwarded-proto") == "https" or "railway.app" in base_url
-        ) and request.query_params.get("oauth") != "1":
+        if (request.headers.get("x-forwarded-proto") == "https" or "railway.app" in base_url) and request.query_params.get("oauth") != "1":
             return JSONResponse(status_code=404, content={"detail": "No authentication required for this MCP server."})
         return JSONResponse(status_code=200, content=get_oauth_metadata(base_url))
 
     @app.get("/oauth/authorize")
     def oauth_authorize(
-        response_type: str = Query(default="code"),
-        client_id: str = Query(...),
-        redirect_uri: str = Query(...),
-        code_challenge: str = Query(...),
-        code_challenge_method: str = Query(default="S256"),
-        scope: str = Query(default="mcp:tools"),
+        response_type: str = Query(default="code"), client_id: str = Query(...),
+        redirect_uri: str = Query(...), code_challenge: str = Query(...),
+        code_challenge_method: str = Query(default="S256"), scope: str = Query(default="mcp:tools"),
         state: str | None = Query(default=None),
     ) -> JSONResponse:
         if response_type != "code":
-            return JSONResponse(
-                status_code=400,
-                content={"error": "unsupported_response_type", "error_description": "Use response_type=code"},
-            )
+            return JSONResponse(status_code=400, content={"error": "unsupported_response_type", "error_description": "Use response_type=code"})
         try:
             grant = issue_authorization_code(
-                client_id=client_id,
-                redirect_uri=redirect_uri,
-                code_challenge=code_challenge,
-                code_challenge_method=code_challenge_method,
-                scope=scope,
-                state=state,
+                client_id=client_id, redirect_uri=redirect_uri, code_challenge=code_challenge,
+                code_challenge_method=code_challenge_method, scope=scope, state=state,
             )
             return JSONResponse(status_code=200, content=grant)
         except ValueError as exc:
-            return JSONResponse(
-                status_code=400,
-                content={"error": "invalid_request", "error_description": str(exc)},
-            )
+            return JSONResponse(status_code=400, content={"error": "invalid_request", "error_description": str(exc)})
 
     @app.post("/oauth/token")
     async def oauth_token(request: Request) -> JSONResponse:
@@ -275,22 +211,16 @@ def create_app() -> FastAPI:
         else:
             qs = parse_qs(raw_body, keep_blank_values=True)
             params = {k: v[0] for k, v in qs.items() if v}
-
         if params.get("grant_type") != "authorization_code":
             return JSONResponse(status_code=400, content={"error": "unsupported_grant_type"})
         try:
             token_data = exchange_code_for_token(
-                code=params.get("code", ""),
-                code_verifier=params.get("code_verifier", ""),
-                client_id=params.get("client_id", ""),
-                redirect_uri=params.get("redirect_uri", ""),
+                code=params.get("code", ""), code_verifier=params.get("code_verifier", ""),
+                client_id=params.get("client_id", ""), redirect_uri=params.get("redirect_uri", ""),
             )
             return JSONResponse(status_code=200, content=token_data)
         except ValueError as exc:
-            return JSONResponse(
-                status_code=400,
-                content={"error": "invalid_grant", "error_description": str(exc)},
-            )
+            return JSONResponse(status_code=400, content={"error": "invalid_grant", "error_description": str(exc)})
 
     @app.get("/mcp")
     def mcp_stream_info() -> dict[str, Any]:
@@ -313,25 +243,26 @@ def create_app() -> FastAPI:
                 status_code=200,
                 content={"jsonrpc": "2.0", "id": None, "error": {"code": -32700, "message": "Parse error"}},
             )
+        forwarded = (request.headers.get("x-forwarded-for") or "").split(",")[-1].strip()
+        caller_ip = request.headers.get("cf-connecting-ip") or forwarded or (request.client.host if request.client else "anonymous")
+        raw_hdr_cid = (request.headers.get("x-client-id") or "").strip()
+        caller_client_id = (f"mcp-{caller_ip}" if _is_prod_runtime() else (raw_hdr_cid or f"mcp-{caller_ip}"))
+        caller_api_key = request.headers.get("x-clauseguard-key") or request.headers.get("x-api-key")
+        caller_bearer = request.headers.get("authorization")
+
         if isinstance(payload, list):
             results = []
             for item in payload:
                 if isinstance(item, dict) and item.get("id") is None and str(item.get("method", "")).startswith("notifications/"):
                     continue
                 if isinstance(item, dict):
-                    results.append(handle_mcp_jsonrpc(item))
-            if not results:
-                return Response(status_code=202)
-            return JSONResponse(status_code=200, content=results)
+                    results.append(handle_mcp_jsonrpc(item, client_id=caller_client_id, api_key=caller_api_key, bearer_token=caller_bearer))
+            return Response(status_code=202) if not results else JSONResponse(status_code=200, content=results)
 
         method = str(payload.get("method", ""))
         params = payload.get("params") or {}
         client_info = params.get("clientInfo") or {}
-        src = detect_source(
-            request.headers.get("user-agent", ""),
-            path="/mcp",
-            client_name=str(client_info.get("name", "")),
-        )
+        src = detect_source(request.headers.get("user-agent", ""), path="/mcp", client_name=str(client_info.get("name", "")))
         if method in ("initialize", "tools/list"):
             record_event(event_type="mcp_connect", source=src, detail=method)
         elif method == "tools/call":
@@ -342,16 +273,11 @@ def create_app() -> FastAPI:
 
         if payload.get("id") is None and method.startswith("notifications/"):
             return Response(status_code=202)
-
-        return JSONResponse(status_code=200, content=handle_mcp_jsonrpc(payload))
+        return JSONResponse(status_code=200, content=handle_mcp_jsonrpc(payload, client_id=caller_client_id, api_key=caller_api_key, bearer_token=caller_bearer))
 
     @app.get("/api/samples")
     def get_samples() -> dict[str, Any]:
-        return {
-            "contracts": SAMPLE_CONTRACTS,
-            "questionnaire": list(SAMPLE_QUESTIONNAIRE),
-            "diff_versions": SAMPLE_DIFF_VERSIONS,
-        }
+        return {"contracts": SAMPLE_CONTRACTS, "questionnaire": list(SAMPLE_QUESTIONNAIRE), "diff_versions": SAMPLE_DIFF_VERSIONS}
 
     @app.get("/api/quota")
     def get_quota_status(
@@ -359,13 +285,7 @@ def create_app() -> FastAPI:
         x_clauseguard_key: str | None = Header(default=None),
         authorization: str | None = Header(default=None),
     ) -> dict[str, Any]:
-        q = check_and_consume_quota(
-            client_id=x_client_id,
-            api_key=x_clauseguard_key,
-            bearer_token=authorization,
-            consume=False,
-        )
-        return q.__dict__
+        return check_and_consume_quota(client_id=x_client_id, api_key=x_clauseguard_key, bearer_token=authorization, consume=False).__dict__
 
     @app.post("/api/extract-docx")
     async def api_extract_docx(request: Request) -> JSONResponse:
@@ -522,6 +442,34 @@ def create_app() -> FastAPI:
             audit_req = AuditContractRequest(**raw)
         except (ValidationError, ValueError) as exc:
             return JSONResponse(status_code=422, content={"success": False, "error": str(exc)})
+        forwarded = (request.headers.get("x-forwarded-for") or "").split(",")[-1].strip()
+        caller_ip = request.headers.get("cf-connecting-ip") or forwarded or (request.client.host if request.client else "anonymous")
+        raw_hdr_cid = (request.headers.get("x-client-id") or "").strip()
+        caller_cid = f"chatgpt-{caller_ip}" if _is_prod_runtime() else (raw_hdr_cid or f"chatgpt-{caller_ip}")
+        api_key = (
+            (str(raw.get("api_key", "")).strip() if isinstance(raw, dict) else "")
+            or request.headers.get("x-clauseguard-key")
+            or request.headers.get("x-api-key")
+        )
+        quota = check_and_consume_quota(
+            client_id=caller_cid,
+            api_key=api_key,
+            bearer_token=request.headers.get("authorization"),
+            consume=True,
+        )
+        if not quota.allowed:
+            return JSONResponse(
+                status_code=402,
+                content={
+                    "success": False,
+                    "code": "FREE_QUOTA_EXCEEDED",
+                    "error": (
+                        f"Complimentary review limit reached (1/1 this month). "
+                        f"Upgrade to ClauseGuard Professional ({PRO_PRICE_LABEL}) at {STRIPE_UPGRADE_URL} for unlimited reviews."
+                    ),
+                    "quota": quota.__dict__,
+                },
+            )
         res = audit_and_redline_contract(audit_req)
         record_event(
             event_type="tool_call",
@@ -529,135 +477,14 @@ def create_app() -> FastAPI:
             tool_name="audit_and_redline_contract",
             detail=audit_req.playbook,
         )
-        audit_dict = res.model_dump(mode="json", exclude={"docx_base64"})
+        audit_dict = res.model_dump(mode="json", exclude={"redlined_docx_b64"})
         audit_dict["public_download_url"] = f"https://clauseguard-mcp-production.up.railway.app{res.download_url}"
         audit_dict["web_review_desk_url"] = "https://clauseguard-mcp-production.up.railway.app"
-        return JSONResponse(status_code=200, content={"success": True, "audit": audit_dict})
+        return JSONResponse(status_code=200, content={"success": True, "quota": quota.__dict__, "audit": audit_dict})
 
     @app.get("/chatgpt-openapi.json")
     def get_chatgpt_openapi() -> JSONResponse:
-        ok_resp = {
-            "200": {
-                "description": "Successful plain-English review response.",
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "success": {"type": "boolean"},
-                            },
-                        }
-                    }
-                },
-            }
-        }
-        return JSONResponse(
-            content={
-                "openapi": "3.1.0",
-                "info": {
-                    "title": "ClauseGuard: Contract Redlines",
-                    "description": "Review commercial agreements in plain English, generate Microsoft Word (.docx) files with native Track Changes, compare contract versions, and complete customer security questionnaires.",
-                    "version": "1.0.0",
-                },
-                "servers": [{"url": "https://clauseguard-mcp-production.up.railway.app"}],
-                "paths": {
-                    "/api/chatgpt/audit": {
-                        "post": {
-                            "operationId": "auditAndRedlineContract",
-                            "summary": "Review a contract against a negotiation playbook and generate a downloadable Word (.docx) file with Track Changes.",
-                            "x-openai-isConsequential": False,
-                            "requestBody": {
-                                "required": True,
-                                "content": {
-                                    "application/json": {
-                                        "schema": {
-                                            "type": "object",
-                                            "required": ["contract_text"],
-                                            "properties": {
-                                                "contract_text": {
-                                                    "type": "string",
-                                                    "description": "Full plain-text wording of the commercial contract to review and redline.",
-                                                },
-                                                "playbook": {
-                                                    "type": "string",
-                                                    "enum": ["founder_friendly", "saas_vendor", "gdpr_dpa", "hipaa_baa"],
-                                                    "default": "founder_friendly",
-                                                    "description": "Negotiation playbook to apply: founder_friendly, saas_vendor, gdpr_dpa, or hipaa_baa.",
-                                                },
-                                                "contract_name": {
-                                                    "type": "string",
-                                                    "default": "Agreement_Redlined.docx",
-                                                    "description": "Filename for the generated Microsoft Word (.docx) Track Changes document.",
-                                                },
-                                            },
-                                        }
-                                    }
-                                },
-                            },
-                            "responses": ok_resp,
-                        }
-                    },
-                    "/api/questionnaire": {
-                        "post": {
-                            "operationId": "autofillSecurityQuestionnaire",
-                            "summary": "Complete customer security and privacy questionnaire items in plain English.",
-                            "x-openai-isConsequential": False,
-                            "requestBody": {
-                                "required": True,
-                                "content": {
-                                    "application/json": {
-                                        "schema": {
-                                            "type": "object",
-                                            "required": ["items"],
-                                            "properties": {
-                                                "items": {
-                                                    "type": "array",
-                                                    "description": "List of customer security or privacy questionnaire items to answer.",
-                                                    "items": {
-                                                        "type": "object",
-                                                        "required": ["id", "question"],
-                                                        "properties": {
-                                                            "id": {"type": "string", "description": "Question identifier (e.g., Q-01)."},
-                                                            "question": {"type": "string", "description": "Full text of the security question."},
-                                                        },
-                                                    },
-                                                }
-                                            },
-                                        }
-                                    }
-                                },
-                            },
-                            "responses": ok_resp,
-                        }
-                    },
-                    "/api/compare": {
-                        "post": {
-                            "operationId": "compareContractVersions",
-                            "summary": "Compare two agreement drafts and highlight material financial or legal risk shifts.",
-                            "x-openai-isConsequential": False,
-                            "requestBody": {
-                                "required": True,
-                                "content": {
-                                    "application/json": {
-                                        "schema": {
-                                            "type": "object",
-                                            "required": ["version_a_text", "version_b_text"],
-                                            "properties": {
-                                                "version_a_text": {"type": "string", "description": "Original baseline contract draft text."},
-                                                "version_b_text": {"type": "string", "description": "Revised counterparty contract draft text."},
-                                                "version_a_name": {"type": "string", "default": "Initial_Agreement_Draft.docx", "description": "Baseline draft filename."},
-                                                "version_b_name": {"type": "string", "default": "Counterparty_Returned_Markup.docx", "description": "Revised draft filename."},
-                                            },
-                                        }
-                                    }
-                                },
-                            },
-                            "responses": ok_resp,
-                        }
-                    },
-                },
-            }
-        )
+        return JSONResponse(content=build_chatgpt_openapi_spec())
 
     return app
 

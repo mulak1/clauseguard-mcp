@@ -249,11 +249,20 @@ def _build_sign_off_recommendation(
     findings: tuple[RedlineFinding, ...],
 ) -> str:
     if not findings:
-        return "Ready to sign — terms are balanced and match standard commercial expectations."
+        return (
+            "Playbook Alignment Summary: 0 commercial checklist variances detected. "
+            "Informational checklist only (not legal advice) — review with qualified legal counsel before execution."
+        )
     crit_count = sum(1 for f in findings if f.severity in ("CRITICAL", "HIGH"))
     if crit_count > 0:
-        return f"Do not sign as-is — {crit_count} high-impact clause(s) should be revised before signature."
-    return "Negotiate minor commercial adjustments before signing."
+        return (
+            f"Playbook Alignment Summary: {crit_count} commercial checklist variance(s) flagged for discussion "
+            "with your qualified legal counsel before execution (informational checklist only — not legal advice)."
+        )
+    return (
+        "Playbook Alignment Summary: Minor commercial checklist variances noted for review with your "
+        "qualified legal counsel (informational checklist only — not legal advice)."
+    )
 
 
 def _build_executive_summary(

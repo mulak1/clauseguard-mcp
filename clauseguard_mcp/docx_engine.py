@@ -203,9 +203,9 @@ def _build_header_xml(
     finding_count: int,
 ) -> str:
     header_line = escape(
-        f"CLAUSEGUARD MCP LEGAL AUDIT & REDLINE — {contract_name} | "
-        f"Playbook: {playbook_name} | Risk Score: {risk_score}/100 ({risk_level}) | "
-        f"Tracked Redlines: {finding_count}"
+        f"CLAUSEGUARD COMMERCIAL PLAYBOOK COMPARISON & REDLINE — {contract_name} | "
+        f"Playbook: {playbook_name} | Variance Score: {risk_score}/100 ({risk_level}) | "
+        f"Tracked Redlines: {finding_count} (Informational Only — Not Legal Advice)"
     )
     return (
         '<w:p><w:r><w:rPr><w:b/><w:color w:val="1E293B"/></w:rPr>'

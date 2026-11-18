@@ -18,7 +18,7 @@ def render_studio_html() -> str:
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ClauseGuard — Commercial Contract Review, Word Track Changes &amp; Security Desk</title>
+  <title>ClauseGuard — Commercial Playbook Comparison, Word Track Changes &amp; Security Desk</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/png" href="/icon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -458,8 +458,8 @@ def render_studio_html() -> str:
           </svg>
         </div>
         <div>
-          <div class="brand-title">ClauseGuard MCP — Commercial Contract &amp; Security Review Desk</div>
-          <div class="brand-sub">Plain-English Agreement Review, Word Track Changes (.docx) &amp; Security Questionnaires</div>
+          <div class="brand-title">ClauseGuard MCP — Commercial Playbook Comparison &amp; Security Desk</div>
+          <div class="brand-sub">Plain-English Playbook Checklist, Word Track Changes (.docx) &amp; Security Questionnaires (Informational Only — Not Legal Advice)</div>
         </div>
       </div>
       <div class="trust-strip">
@@ -576,7 +576,7 @@ def render_studio_html() -> str:
             </div>
             <div>
               <label for="reviewerNameInput">Reviewer Name in Word Track Changes</label>
-              <input id="reviewerNameInput" value="ClauseGuard Legal Desk" />
+              <input id="reviewerNameInput" value="ClauseGuard Document Comparison" />
             </div>
           </div>
         </details>

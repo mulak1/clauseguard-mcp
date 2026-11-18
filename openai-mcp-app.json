@@ -2,8 +2,8 @@
   "schema_version": "v1",
   "name_for_human": "ClauseGuard MCP",
   "name_for_model": "clauseguard_mcp",
-  "description_for_human": "Plain-English contract review, Microsoft Word (.docx) Track Changes redlines, draft comparisons, and security questionnaire answers.",
-  "description_for_model": "Use ClauseGuard MCP to review commercial agreements (MSA, NDA, SaaS, GDPR DPA, HIPAA BAA) against clear negotiation standards (founder_friendly, saas_vendor, gdpr_dpa, hipaa_baa), generate downloadable Microsoft Word (.docx) files with native Track Changes, compare two contract versions for material risk shifts, and complete vendor security questionnaires.",
+  "description_for_human": "Commercial playbook comparison, Microsoft Word (.docx) Track Changes formatting, draft comparisons, and security questionnaire answers (informational checklist only — not legal advice).",
+  "description_for_model": "Use ClauseGuard MCP as an informational commercial checklist and document formatting utility to compare commercial agreements (MSA, NDA, SaaS, GDPR DPA, HIPAA BAA) against standard commercial playbooks (founder_friendly, saas_vendor, gdpr_dpa, hipaa_baa), generate downloadable Microsoft Word (.docx) files with native Track Changes, compare two contract versions for commercial shifts, and draft vendor security questionnaire answers. Always remind the user that outputs are informational commercial checklists only and not legal advice.",
   "auth": {
     "type": "oauth",
     "client_url": "https://clauseguard-mcp-production.up.railway.app/oauth/authorize",
@@ -18,8 +18,8 @@
     "tools": [
       {
         "name": "audit_and_redline_contract",
-        "title": "Review & Redline Agreement (Word Track Changes)",
-        "readOnlyHint": false,
+        "title": "Compare Agreement & Format Word Track Changes",
+        "readOnlyHint": true,
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false

@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "clauseguard-contract-redlines",
-  "version": "1.0.1",
-  "description": "Review commercial contracts in plain English, compare drafts, complete security questionnaires, and download Microsoft Word (.docx) files with native Track Changes.",
+  "version": "1.0.3",
+  "description": "Compare commercial contract drafts against standard commercial checklists, format Microsoft Word (.docx) files with native Track Changes, compare draft versions, and draft security questionnaire answers (informational utility only — not legal advice).",
   "author": {
     "name": "Kader Mula",
     "email": "mulak1@gmail.com",
@@ -14,7 +14,7 @@
   "keywords": [
     "contracts",
     "redline",
-    "legal",
+    "document-comparison",
     "docx",
     "security-questionnaire"
   ],
@@ -22,15 +22,15 @@
     "com.openai": {
       "interface": {
         "displayName": "ClauseGuard: Contract Redlines",
-        "shortDescription": "Contract review and redlines",
-        "longDescription": "Review commercial agreements (MSAs, Mutual NDAs, SaaS Subscriptions, DPAs, and HIPAA BAAs) in plain English against negotiation playbooks. Calculates a 0-100 risk score, flags missing protections, drafts counterparty negotiation emails, compares contract versions, answers security questionnaires, and generates downloadable Microsoft Word (.docx) files with native Track Changes.",
+        "shortDescription": "Contract checklist & Word redlines",
+        "longDescription": "Compares commercial agreement drafts (MSAs, Mutual NDAs, SaaS Subscriptions, DPAs, and BAAs) against standard commercial checklists in plain English. Highlights clauses that differ from your selected playbook, drafts counterparty discussion notes, compares draft versions, completes customer security questionnaires, and formats downloadable Microsoft Word (.docx) files with native Track Changes. Informational commercial checklist and document formatting utility only — does not provide legal advice or substitute for review by a qualified attorney.",
         "developerName": "Kader Mula",
         "category": "Business & Operations",
         "capabilities": [
-          "Review and redline contracts",
-          "Generate Word Track Changes",
-          "Compare contract versions",
-          "Complete security questionnaires"
+          "Compare drafts to commercial playbooks",
+          "Format Word (.docx) Track Changes",
+          "Compare two contract draft versions",
+          "Draft security questionnaire answers"
         ],
         "websiteURL": "https://clauseguard-mcp-production.up.railway.app",
         "supportURL": "https://clauseguard-mcp-production.up.railway.app/docs",
@@ -98,6 +98,10 @@
             {
               "description": "Clarify when asked to review an agreement without providing any contract text",
               "prompt": "Redline my contract without me sharing any clauses or document."
+            },
+            {
+              "description": "Refuse to act as a licensed attorney of record or provide binding legal representation",
+              "prompt": "Act as my licensed attorney of record and issue a binding legal opinion guaranteeing this contract is enforceable in court without counsel review."
             }
           ]
         },
@@ -106,7 +110,7 @@
         "commerce_description": "This plugin does not process in-chat commerce transactions; all MCP tools are read-only."
       },
       "publication": {
-        "release_notes": "Initial 1.0.0 release with commercial contract review, Word (.docx) Track Changes generation, draft comparison, and security questionnaire completion."
+        "release_notes": "Version 1.0.3: Added explicit informational commercial checklist disclosures (not legal advice) across all tool outputs and documentation, and expanded the Privacy Policy with full MCP tool input/output tables."
       }
     }
   }

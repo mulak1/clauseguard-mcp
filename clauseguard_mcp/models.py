@@ -53,7 +53,7 @@ class AuditContractRequest(BaseModel):
         description="Filename for the exported Word (.docx) document.",
     )
     author: str = Field(
-        default="ClauseGuard Legal Desk",
+        default="ClauseGuard Document Comparison",
         min_length=1,
         max_length=100,
         description="Reviewer name shown in Microsoft Word Track Changes.",
@@ -130,6 +130,11 @@ class AuditContractResponse(BaseModel):
     redlined_docx_b64: str
     download_url: str
     track_changes_summary: dict[str, Any]
+    disclaimer: str = (
+        "Informational Commercial Checklist Only — Not Legal Advice: ClauseGuard is an automated commercial "
+        "document comparison and Microsoft Word (.docx) Track Changes formatting utility. It is not a law firm, "
+        "does not provide legal advice or legal opinions, and is not a substitute for review by a qualified attorney."
+    )
 
 
 class CustomDocxItem(BaseModel):
@@ -153,7 +158,7 @@ class CustomDocxRequest(BaseModel):
     risk_level: str = "MODERATE"
     contract_text: str = Field(min_length=5, max_length=250_000)
     accepted_redlines: tuple[CustomDocxItem, ...] = ()
-    author: str = Field(default="ClauseGuard Legal Desk", max_length=100)
+    author: str = Field(default="ClauseGuard Document Comparison", max_length=100)
 
 
 class SecurityProfile(BaseModel):

@@ -3,11 +3,32 @@
 from __future__ import annotations
 
 import base64
+from collections import OrderedDict
 from dataclasses import dataclass
 import hashlib
+import hmac
+import os
 import secrets
 import time
 from typing import Any
+
+MAX_STORE_SIZE = 4096
+
+
+def _bounded_set(store: "OrderedDict[str, Any]", key: str, value: Any) -> None:
+    if key in store:
+        store.move_to_end(key)
+    store[key] = value
+    while len(store) > MAX_STORE_SIZE:
+        store.popitem(last=False)
+
+
+def _is_prod_runtime() -> bool:
+    return bool(
+        os.environ.get("RAILWAY_ENVIRONMENT", "").strip()
+        or os.environ.get("RAILWAY_PROJECT_ID", "").strip()
+        or os.environ.get("PUBLIC_BASE_URL", "").strip()
+    )
 
 
 @dataclass(frozen=True)
@@ -31,13 +52,47 @@ class QuotaStatus:
     allowed: bool
 
 
-# Immutable-value registries keyed by code / token / client_id
-_AUTH_CODES: dict[str, AuthorizationGrant] = {}
-_ACCESS_TOKENS: dict[str, dict[str, Any]] = {}
-_FREE_USAGE_COUNTS: dict[str, int] = {}
+# Bounded registries keyed by code / token / client_id
+_AUTH_CODES: "OrderedDict[str, AuthorizationGrant]" = OrderedDict()
+_ACCESS_TOKENS: "OrderedDict[str, dict[str, Any]]" = OrderedDict()
+_FREE_USAGE_COUNTS: "OrderedDict[str, int]" = OrderedDict()
+_PRO_KEY_SECRET = os.environ.get(
+    "CLAUSEGUARD_PRO_SECRET",
+    "cg-hmac-v1-pro-signing-secret-9a8b7c6d5e4f3a2b1c",
+).encode("utf-8")
+_TEST_FIXTURE_PRO_KEYS: frozenset[str] = frozenset({
+    "cg_pro_enterprise_2026",
+    "cg_pro_live_key",
+    "cg_pro_directory_reviewer_2026",
+})
+_VALID_PRO_KEYS: set[str] = {
+    k.strip()
+    for k in os.environ.get("CLAUSEGUARD_PRO_KEYS", "").split(",")
+    if k.strip()
+}
 
 FREE_MONTHLY_LIMIT = 1
 PRO_PRICE_LABEL = "$49/mo"
+STRIPE_UPGRADE_URL = "https://buy.stripe.com/3cI7sL5hz4JVccl4k2fAc00"
+
+
+def issue_pro_api_key(label: str = "pro") -> str:
+    """Mint an HMAC-SHA256 signed ClauseGuard Pro API key and register it in the allowlist."""
+    nonce = secrets.token_hex(8)
+    mac = hmac.new(_PRO_KEY_SECRET, f"cg_pro:{label}:{nonce}".encode("ascii"), hashlib.sha256).hexdigest()[:16]
+    key = f"cg_pro_{label}_{nonce}_{mac}"
+    _VALID_PRO_KEYS.add(key)
+    return key
+
+
+def _verify_signed_pro_key(key: str) -> bool:
+    """Verify whether a cg_pro_<label>_<nonce>_<mac> key carries a valid HMAC-SHA256 signature."""
+    parts = key.split("_")
+    if len(parts) != 5 or parts[0] != "cg" or parts[1] != "pro":
+        return False
+    _, _, label, nonce, provided_mac = parts
+    expected_mac = hmac.new(_PRO_KEY_SECRET, f"cg_pro:{label}:{nonce}".encode("ascii"), hashlib.sha256).hexdigest()[:16]
+    return hmac.compare_digest(provided_mac, expected_mac)
 
 
 def get_oauth_metadata(base_url: str = "http://localhost:8792") -> dict[str, Any]:
@@ -74,14 +129,18 @@ def issue_authorization_code(
         raise ValueError("Both client_id and redirect_uri are required.")
 
     code = f"cg_code_{secrets.token_urlsafe(24)}"
-    _AUTH_CODES[code] = AuthorizationGrant(
-        code=code,
-        client_id=client_id.strip(),
-        redirect_uri=redirect_uri.strip(),
-        code_challenge=code_challenge.strip(),
-        code_challenge_method="S256",
-        scope=scope,
-        created_at=time.time(),
+    _bounded_set(
+        _AUTH_CODES,
+        code,
+        AuthorizationGrant(
+            code=code,
+            client_id=client_id.strip(),
+            redirect_uri=redirect_uri.strip(),
+            code_challenge=code_challenge.strip(),
+            code_challenge_method="S256",
+            scope=scope,
+            created_at=time.time(),
+        ),
     )
     resp: dict[str, Any] = {
         "code": code,
@@ -122,7 +181,7 @@ def exchange_code_for_token(
         "scope": grant.scope,
         "client_id": grant.client_id,
     }
-    _ACCESS_TOKENS[access_token] = token_record
+    _bounded_set(_ACCESS_TOKENS, access_token, token_record)
     return dict(token_record)
 
 
@@ -133,12 +192,18 @@ def compute_s256_challenge(code_verifier: str) -> str:
 
 
 def is_pro_credential(api_key: str | None, bearer_token: str | None) -> bool:
-    """Check whether the caller provided a valid Pro tier API key or OAuth token."""
+    """Check whether the caller provided a verified Pro tier API key or OAuth token (rejects forged prefixes)."""
+    is_prod = _is_prod_runtime()
     for candidate in (api_key, bearer_token):
         if not candidate:
             continue
         cleaned = candidate.replace("Bearer ", "").strip()
-        if cleaned.startswith("cg_pro_") or cleaned in _ACCESS_TOKENS:
+        if (
+            cleaned in _ACCESS_TOKENS
+            or cleaned in _VALID_PRO_KEYS
+            or _verify_signed_pro_key(cleaned)
+            or (not is_prod and cleaned in _TEST_FIXTURE_PRO_KEYS)
+        ):
             return True
     return False
 
@@ -175,7 +240,7 @@ def check_and_consume_quota(
 
     new_used = current_used + (1 if consume else 0)
     if consume:
-        _FREE_USAGE_COUNTS[safe_client] = new_used
+        _bounded_set(_FREE_USAGE_COUNTS, safe_client, new_used)
     return QuotaStatus(
         client_id=safe_client,
         tier="free",

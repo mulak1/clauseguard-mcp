@@ -13,6 +13,12 @@ from clauseguard_mcp.models import (
     CompareVersionsRequest,
     QuestionnaireRequest,
 )
+from clauseguard_mcp.oauth import (
+    PRO_PRICE_LABEL,
+    STRIPE_UPGRADE_URL,
+    _is_prod_runtime,
+    check_and_consume_quota,
+)
 from clauseguard_mcp.questionnaire_engine import (
     autofill_security_questionnaire,
     compare_contract_versions,
@@ -24,15 +30,17 @@ MCP_PROTOCOL_VERSION = "2025-03-26"
 MCP_TOOLS_CATALOG: tuple[dict[str, Any], ...] = (
     {
         "name": "audit_and_redline_contract",
-        "title": "Review & Redline Contract",
+        "title": "Compare Agreement Against Commercial Playbook & Format Word Track Changes",
         "description": (
-            "Analyzes commercial agreements (MSA, Mutual NDA, SaaS Subscription, or Data Processing "
-            "Agreement) in plain English against a negotiation playbook, calculates a 0–100 risk score, "
-            "flags missing protections, and returns clause-by-clause replacement wording and a draft "
-            "counterparty negotiation summary without modifying external systems."
+            "Compares commercial agreement drafts (MSA, Mutual NDA, SaaS Subscription, or Data Processing "
+            "Addendum) in plain English against a selected commercial checklist, calculates a 0–100 checklist "
+            "variance score, and formats suggested Microsoft Word (.docx) Track Changes and a draft "
+            "counterparty discussion summary without modifying external systems. Informational commercial "
+            "checklist and document formatting utility only — does not provide legal advice or substitute "
+            "for review by a qualified attorney."
         ),
         "annotations": {
-            "title": "Review & Redline Contract",
+            "title": "Compare Agreement & Format Word Track Changes",
             "readOnlyHint": True,
             "destructiveHint": False,
             "idempotentHint": True,
@@ -50,7 +58,7 @@ MCP_TOOLS_CATALOG: tuple[dict[str, Any], ...] = (
                     "type": "string",
                     "enum": ["founder_friendly", "saas_vendor", "gdpr_dpa", "hipaa_baa"],
                     "default": "founder_friendly",
-                    "description": "Negotiation playbook to evaluate against: founder_friendly, saas_vendor, gdpr_dpa, or hipaa_baa.",
+                    "description": "Commercial checklist to compare against: founder_friendly, saas_vendor, gdpr_dpa, or hipaa_baa.",
                 },
                 "contract_name": {
                     "type": "string",
@@ -59,8 +67,12 @@ MCP_TOOLS_CATALOG: tuple[dict[str, Any], ...] = (
                 },
                 "author": {
                     "type": "string",
-                    "default": "ClauseGuard Legal Desk",
+                    "default": "ClauseGuard Document Comparison",
                     "description": "Reviewer label displayed in the redline summary.",
+                },
+                "api_key": {
+                    "type": "string",
+                    "description": "Optional ClauseGuard Professional Plan API key for unlimited monthly agreement reviews.",
                 },
             },
         },
@@ -71,7 +83,8 @@ MCP_TOOLS_CATALOG: tuple[dict[str, Any], ...] = (
         "description": (
             "Drafts plain-English security and privacy responses, control evidence citations, and "
             "confidence ratings for customer due-diligence questionnaires across SOC 2 Type II, "
-            "GDPR, HIPAA, ISO 27001, encryption, incident response, access control, and resilience."
+            "GDPR, HIPAA, ISO 27001, encryption, incident response, access control, and resilience. "
+            "Informational security documentation helper only — not legal or compliance certification advice."
         ),
         "annotations": {
             "title": "Complete Security Questionnaire",
@@ -110,6 +123,10 @@ MCP_TOOLS_CATALOG: tuple[dict[str, Any], ...] = (
                     "type": "object",
                     "description": "Optional organization security posture overrides (such as encryption standard or breach notification window).",
                 },
+                "api_key": {
+                    "type": "string",
+                    "description": "Optional ClauseGuard Professional Plan API key.",
+                },
             },
         },
     },
@@ -118,8 +135,9 @@ MCP_TOOLS_CATALOG: tuple[dict[str, Any], ...] = (
         "title": "Compare Two Contract Drafts",
         "description": (
             "Compares an earlier contract draft against a counterparty markup clause-by-clause and "
-            "flags material business or legal shifts such as uncapped liability, extended payment "
-            "windows, changed governing law, multi-year auto-renewals, and one-sided indemnity."
+            "flags material commercial changes such as uncapped liability, extended payment "
+            "windows, changed governing law, multi-year auto-renewals, and one-sided indemnity. "
+            "Informational text-diff utility only — does not provide legal advice."
         ),
         "annotations": {
             "title": "Compare Two Contract Drafts",
@@ -150,13 +168,23 @@ MCP_TOOLS_CATALOG: tuple[dict[str, Any], ...] = (
                     "default": "Counterparty_Markup_v2.docx",
                     "description": "Label or filename for the revised counterparty contract draft.",
                 },
+                "api_key": {
+                    "type": "string",
+                    "description": "Optional ClauseGuard Professional Plan API key.",
+                },
             },
         },
     },
 )
 
 
-def handle_mcp_jsonrpc(payload: dict[str, Any]) -> dict[str, Any]:
+def handle_mcp_jsonrpc(
+    payload: dict[str, Any],
+    *,
+    client_id: str = "anonymous",
+    api_key: str | None = None,
+    bearer_token: str | None = None,
+) -> dict[str, Any]:
     """Process a single JSON-RPC 2.0 request for the Streamable HTTP /mcp endpoint."""
     rpc_id = payload.get("id")
     method = payload.get("method")
@@ -174,7 +202,10 @@ def handle_mcp_jsonrpc(payload: dict[str, Any]) -> dict[str, Any]:
                 "serverInfo": {
                     "name": "ClauseGuard MCP",
                     "version": "1.0.0",
-                    "description": "Contract Redlining (.docx Word Track Changes) & Security Questionnaire MCP Server",
+                    "description": (
+                        "Commercial Playbook Comparison, Word (.docx) Track Changes Formatter & Security "
+                        "Questionnaire Helper (Informational Checklist Only — Not Legal Advice)"
+                    ),
                 },
             },
         )
@@ -186,18 +217,67 @@ def handle_mcp_jsonrpc(payload: dict[str, Any]) -> dict[str, Any]:
         return _rpc_result(rpc_id, {"tools": list(MCP_TOOLS_CATALOG)})
 
     if method == "tools/call":
-        return _dispatch_tool_call(rpc_id, params)
+        return _dispatch_tool_call(
+            rpc_id,
+            params,
+            client_id=client_id,
+            api_key=api_key,
+            bearer_token=bearer_token,
+        )
 
     return _rpc_error(rpc_id, -32601, f"Method not found: {method}")
 
 
-def _dispatch_tool_call(rpc_id: Any, params: dict[str, Any]) -> dict[str, Any]:
+def _dispatch_tool_call(
+    rpc_id: Any,
+    params: dict[str, Any],
+    *,
+    client_id: str = "anonymous",
+    api_key: str | None = None,
+    bearer_token: str | None = None,
+) -> dict[str, Any]:
     tool_name = params.get("name")
     arguments = params.get("arguments") or {}
+    arg_key = (
+        str(arguments.get("api_key", "")).strip()
+        if isinstance(arguments, dict) and arguments.get("api_key")
+        else None
+    )
+    effective_key = arg_key or api_key
+    effective_client = (
+        str(arguments.get("client_id", "")).strip()
+        if (not _is_prod_runtime() and isinstance(arguments, dict) and arguments.get("client_id"))
+        else client_id
+    ) or "anonymous"
 
     try:
         if tool_name == "audit_and_redline_contract":
             req = AuditContractRequest(**arguments) if isinstance(arguments, dict) else AuditContractRequest(contract_text=str(arguments))
+            quota = check_and_consume_quota(
+                client_id=effective_client,
+                api_key=effective_key,
+                bearer_token=bearer_token,
+                consume=True,
+            )
+            if not quota.allowed:
+                upgrade_msg = (
+                    f"Free tier limit reached ({quota.used_this_month}/{quota.monthly_limit} complimentary contract review used this month). "
+                    f"Upgrade to ClauseGuard Professional ({PRO_PRICE_LABEL}) at {STRIPE_UPGRADE_URL} and pass your api_key "
+                    "for unlimited contract reviews and Microsoft Word (.docx) Track Changes redlines."
+                )
+                return _rpc_result(
+                    rpc_id,
+                    {
+                        "isError": True,
+                        "content": [{"type": "text", "text": upgrade_msg}],
+                        "structuredContent": {
+                            "code": "FREE_QUOTA_EXCEEDED",
+                            "error": upgrade_msg,
+                            "upgrade_url": STRIPE_UPGRADE_URL,
+                            "quota": quota.__dict__,
+                        },
+                    },
+                )
             res = audit_and_redline_contract(req)
             data = res.model_dump(mode="json")
             safe_fn = sanitize_docx_filename(res.contract_name)
@@ -205,10 +285,12 @@ def _dispatch_tool_call(rpc_id: Any, params: dict[str, Any]) -> dict[str, Any]:
             public_docx_url = f"https://clauseguard-mcp-production.up.railway.app{res.download_url}"
             data["download_docx_url"] = friendly_docx_url
             data["public_download_url"] = public_docx_url
+            data["quota"] = quota.__dict__
             text_summary = (
                 f"{res.sign_off_recommendation}\n"
                 f"{res.executive_summary}\n"
-                f"Download Word (.docx) with Track Changes: {friendly_docx_url}"
+                f"Download Word (.docx) with Track Changes: {friendly_docx_url}\n"
+                f"Disclaimer: {res.disclaimer}"
             )
             return _tool_success(rpc_id, text_summary, data)
 
@@ -220,9 +302,13 @@ def _dispatch_tool_call(rpc_id: Any, params: dict[str, Any]) -> dict[str, Any]:
             )
             res_q = autofill_security_questionnaire(req_q)
             data_q = res_q.model_dump(mode="json")
+            data_q["disclaimer"] = (
+                "Informational Security Documentation Draft Only — Not Legal or Audit Certification Advice."
+            )
             text_q = (
                 f"Auto-completed {res_q.auto_completed_count}/{res_q.total_items} security questionnaire "
-                f"items for {res_q.company_name} (avg confidence: {res_q.average_confidence:.0%})."
+                f"items for {res_q.company_name} (avg confidence: {res_q.average_confidence:.0%}). "
+                "Informational security documentation draft only — verify against your organization's current audit reports."
             )
             return _tool_success(rpc_id, text_q, data_q)
 
@@ -234,7 +320,14 @@ def _dispatch_tool_call(rpc_id: Any, params: dict[str, Any]) -> dict[str, Any]:
             )
             res_c = compare_contract_versions(req_c)
             data_c = res_c.model_dump(mode="json")
-            return _tool_success(rpc_id, res_c.summary, data_c)
+            data_c["disclaimer"] = (
+                "Informational Document Diff Only — Not Legal Advice: Review all draft changes with qualified legal counsel."
+            )
+            return _tool_success(
+                rpc_id,
+                f"{res_c.summary} (Informational comparison only — not legal advice.)",
+                data_c,
+            )
 
         return _rpc_error(rpc_id, -32602, f"Unknown MCP tool: {tool_name}")
     except (ValidationError, ValueError) as exc:

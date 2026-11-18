@@ -3,16 +3,16 @@
   "name": "ClauseGuard MCP",
   "slug": "clauseguard-mcp",
   "version": "1.0.0",
-  "category": "Legal & Commercial Agreement Review",
+  "category": "Business & Commercial Document Comparison",
   "publisher": {
-    "name": "ClauseGuard Legal Desk",
+    "name": "Kader Mula (ClauseGuard)",
     "website": "https://clauseguard-mcp-production.up.railway.app",
-    "support_email": "support@clauseguard.legal",
+    "support_email": "mulak1@gmail.com",
     "privacy_policy_url": "https://clauseguard-mcp-production.up.railway.app/privacy",
     "terms_of_service_url": "https://clauseguard-mcp-production.up.railway.app/terms"
   },
-  "tagline": "Plain-English contract review, balanced Word Track Changes (.docx), draft comparison, and security questionnaires.",
-  "description": "ClauseGuard helps founders, legal counsel, and deal desks review commercial agreements (MSAs, NDAs, SaaS subscriptions, data privacy addendums, and healthcare BAAs) against clear negotiation standards. It explains unusual clauses in plain English, drafts balanced revisions and fallback compromises, exports a ready-to-send Microsoft Word (.docx) file with native Track Changes, compares draft versions, and completes customer security questionnaires.",
+  "tagline": "Commercial playbook comparison, Word Track Changes (.docx) formatter, draft diff, and security questionnaires (informational checklist only — not legal advice).",
+  "description": "ClauseGuard helps operations, procurement, and deal desks compare commercial agreement drafts (MSAs, NDAs, SaaS subscriptions, data privacy addendums, and BAAs) against standard commercial checklists. It highlights clauses that differ from the selected playbook, formats suggested revisions into a downloadable Microsoft Word (.docx) file with native Track Changes, compares draft versions, and drafts customer security questionnaire responses. Informational checklist utility only — does not provide legal advice.",
   "mcp_endpoint": {
     "url": "https://clauseguard-mcp-production.up.railway.app/mcp",
     "transport": "streamable-http",
@@ -46,9 +46,9 @@
   "tools": [
     {
       "name": "audit_and_redline_contract",
-      "title": "Review & Redline Agreement (Word Track Changes)",
+      "title": "Compare Agreement & Format Word Track Changes",
       "annotations": {
-        "readOnlyHint": false,
+        "readOnlyHint": true,
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
