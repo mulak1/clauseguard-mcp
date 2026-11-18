@@ -1,0 +1,17 @@
+runtime: "container"
+startCommand:
+  type: "http"
+  configSchema:
+    type: object
+    properties:
+      api_key:
+        type: string
+        title: "ClauseGuard Pro API Key (Optional)"
+        description: "Optional ClauseGuard Professional Plan API key (1 agreement review/month included free without a key)."
+      endpointUrl:
+        type: string
+        default: "https://clauseguard-mcp-production.up.railway.app/mcp"
+        description: "Remote Streamable HTTP MCP endpoint URL."
+    required: []
+exampleConfig:
+  endpointUrl: "https://clauseguard-mcp-production.up.railway.app/mcp"

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-10-17/server.schema.json",
+  "name": "io.github.mulak1/clauseguard-mcp",
+  "title": "ClauseGuard — Commercial Contract Redlines",
+  "description": "Commercial contract playbook comparison, Word Track Changes redlines, and security questionnaires.",
+  "version": "1.0.0",
+  "websiteUrl": "https://clauseguard-mcp-production.up.railway.app",
+  "repository": {
+    "url": "https://github.com/mulak1/clauseguard-mcp",
+    "source": "github"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://clauseguard-mcp-production.up.railway.app/mcp"
+    }
+  ]
+}
